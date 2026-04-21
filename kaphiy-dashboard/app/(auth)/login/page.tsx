@@ -1,44 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/features/auth/store/authSlice";
-import { useSound } from "@/src/features/notifications/useSound";
+import { useLogin } from "@/src/features/auth/hooks/useLogin";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const login = useAuthStore((s) => s.login);
-  const { unlock } = useSound();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { mutate, isPending, isError, error } = useLogin();
 
   const [pin, setPin] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [showPin, setShowPin] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    if (isAuthenticated) router.replace("/orders");
+  }, [isAuthenticated, router]);
+
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!pin) return;
-    setLoading(true);
-    setError("");
-
-    try {
-      // Placeholder — replace with real POST /auth/login when backend ready
-      await new Promise((r) => setTimeout(r, 600));
-      const mockToken = `mock-jwt-${Date.now()}`;
-      unlock(); // allow audio after user gesture
-      login(mockToken);
-      router.replace("/orders");
-    } catch {
-      setError("PIN incorrecto. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
+    mutate(
+      { pin },
+      { onSuccess: () => router.replace("/orders") },
+    );
   }
+
+  const errorMsg = isError
+    ? (error?.status === 401 || error?.status === 400
+        ? "PIN incorrecto. Intenta de nuevo."
+        : "Error de servidor. Contacta al administrador.")
+    : null;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--background)] px-6">
-      {/* Brand */}
       <h1 className="font-display mb-2 text-4xl font-semibold tracking-widest text-[var(--praline)]">
         PRALIN<em className="not-italic text-[var(--crema)]">É</em>
       </h1>
@@ -55,7 +51,10 @@ export default function LoginPage() {
           Acceso de Barista
         </h2>
 
-        <label htmlFor="pin" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">
+        <label
+          htmlFor="pin"
+          className="mb-2 block text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]"
+        >
           PIN de turno
         </label>
         <div className="relative mb-6">
@@ -69,8 +68,8 @@ export default function LoginPage() {
             placeholder="••••••"
             maxLength={8}
             required
-            aria-invalid={!!error}
-            aria-describedby={error ? "pin-error" : undefined}
+            aria-invalid={!!errorMsg}
+            aria-describedby={errorMsg ? "pin-error" : undefined}
             className="w-full rounded-xl border border-[var(--border)] bg-[var(--input)] px-4 py-3 pr-12 font-mono text-lg tracking-widest text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:border-[var(--praline)] focus:outline-none"
           />
           <button
@@ -79,24 +78,28 @@ export default function LoginPage() {
             aria-label={showPin ? "Ocultar PIN" : "Mostrar PIN"}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
           >
-            {showPin ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
+            {showPin ? (
+              <EyeOff className="size-4" aria-hidden />
+            ) : (
+              <Eye className="size-4" aria-hidden />
+            )}
           </button>
         </div>
 
-        {error && (
+        {errorMsg && (
           <p id="pin-error" role="alert" className="mb-4 text-xs font-medium text-[var(--sem-alert)]">
-            {error}
+            {errorMsg}
           </p>
         )}
 
         <button
           type="submit"
-          disabled={loading || !pin}
-          aria-busy={loading}
+          disabled={isPending || !pin}
+          aria-busy={isPending}
           className="flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-[18px] bg-[var(--praline)] px-4 py-4 text-sm font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-0.5"
         >
           <LogIn className="size-4" aria-hidden />
-          {loading ? "Ingresando…" : "Ingresar"}
+          {isPending ? "Ingresando…" : "Ingresar"}
         </button>
       </form>
     </div>

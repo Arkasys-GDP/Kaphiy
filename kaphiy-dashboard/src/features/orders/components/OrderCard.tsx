@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { CheckCheck, PackageX } from "lucide-react";
+import { CheckCheck } from "lucide-react";
 import type { Order } from "../types";
 import { semaphoreOf } from "../lib/semaphore";
 import { useElapsedTime } from "../hooks/useElapsedTime";
@@ -15,9 +15,10 @@ interface Props {
   order: Order;
   onStart: (id: string) => Promise<boolean>;
   onReady: (id: string) => Promise<boolean>;
+  onOutOfStock: (orderId: string, itemId: string) => Promise<boolean>;
 }
 
-export function OrderCard({ order, onStart, onReady }: Props) {
+export function OrderCard({ order, onStart, onReady, onOutOfStock }: Props) {
   const warnSecs = useKaphiyStore((s) => s.semaphoreWarnSecs);
   const alertSecs = useKaphiyStore((s) => s.semaphoreAlertSecs);
 
@@ -34,6 +35,16 @@ export function OrderCard({ order, onStart, onReady }: Props) {
       optimisticTransition(order.id, "IN_PREP", "READY", () => onReady(order.id));
     }
   }, [order.id, order.status, optimisticTransition, onStart, onReady]);
+
+  const handleOutOfStock = useCallback(
+    (itemId: string) => {
+      const from = order.status as "PENDING" | "IN_PREP";
+      optimisticTransition(order.id, from, "OUT_OF_STOCK", () =>
+        onOutOfStock(order.id, itemId),
+      );
+    },
+    [order.id, order.status, optimisticTransition, onOutOfStock],
+  );
 
   const actionLabel =
     order.status === "PENDING"
@@ -101,7 +112,15 @@ export function OrderCard({ order, onStart, onReady }: Props) {
         className="flex flex-1 flex-col gap-4 px-6 py-5"
       >
         {order.items.map((item) => (
-          <OrderItem key={item.id} item={item} />
+          <OrderItem
+            key={item.id}
+            item={item}
+            onOutOfStock={
+              order.status === "PENDING" || order.status === "IN_PREP"
+                ? () => handleOutOfStock(item.id)
+                : undefined
+            }
+          />
         ))}
       </ul>
 
@@ -137,20 +156,6 @@ export function OrderCard({ order, onStart, onReady }: Props) {
           </button>
         )}
 
-        {/* Out of stock shortcut */}
-        {(order.status === "PENDING" || order.status === "IN_PREP") && (
-          <button
-            aria-label="Marcar agotado"
-            title="Marcar como agotado"
-            className={cn(
-              "flex cursor-pointer items-center justify-center rounded-[18px] border border-[var(--border)] bg-[var(--card)] px-3 py-4 transition-colors",
-              "hover:border-[var(--sem-alert)] hover:bg-[color-mix(in_oklch,var(--sem-alert)_10%,transparent)] hover:text-[var(--sem-alert)]",
-              "focus-visible:outline-2 focus-visible:outline-[var(--sem-alert)]",
-            )}
-          >
-            <PackageX className="size-4.5" aria-hidden />
-          </button>
-        )}
       </footer>
     </article>
   );

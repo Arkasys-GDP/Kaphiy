@@ -1,23 +1,30 @@
-"use client";
+"use client"
 
-import { useKaphiyStore } from "../store";
-import { OrderCard } from "./OrderCard";
-import { useOrdersSocket } from "../hooks/useOrdersSocket";
-import { InboxIcon } from "lucide-react";
+import { useKaphiyStore } from "../store"
+import { OrderCard } from "./OrderCard"
+import { useOrdersSocket } from "../hooks/useOrdersSocket"
+import { InboxIcon } from "lucide-react"
+import { useMemo } from "react"
 
 interface Props {
-  socketUrl: string;
-  token: string;
+  socketUrl: string
+  token: string
 }
 
 export function OrderGrid({ socketUrl, token }: Props) {
-  const orders = useKaphiyStore((s) =>
-    s.orders.filter(
-      (o) => o.status === "PENDING" || o.status === "IN_PREP" || o.status === "READY",
-    ),
-  );
+  const allOrders = useKaphiyStore((s) => s.orders)
+  const orders = useMemo(
+    () =>
+      allOrders.filter(
+        (o) =>
+          o.status === "PENDING" ||
+          o.status === "IN_PREP" ||
+          o.status === "READY"
+      ),
+    [allOrders]
+  )
 
-  const { startOrder, markReady } = useOrdersSocket(socketUrl, token);
+  const { startOrder, markReady, markOutOfStock } = useOrdersSocket(socketUrl, token)
 
   return (
     <main
@@ -26,13 +33,14 @@ export function OrderGrid({ socketUrl, token }: Props) {
       className="flex flex-1 flex-col overflow-hidden"
     >
       {/* Grid header */}
-      <div className="flex flex-shrink-0 items-end justify-between px-7 pb-2.5 pt-4">
+      <div className="flex flex-shrink-0 items-end justify-between px-7 pt-4 pb-2.5">
         <div>
           <h1 className="font-display text-lg font-bold text-[var(--foreground)]">
             Pedidos Activos
           </h1>
           <p className="mt-0.5 text-[11px] text-[var(--muted-foreground)]">
-            Actualizado en tiempo real · Toca &ldquo;Listo para entregar&rdquo; cuando el pedido esté listo
+            Actualizado en tiempo real · Toca &ldquo;Listo para entregar&rdquo;
+            cuando el pedido esté listo
           </p>
         </div>
 
@@ -45,7 +53,10 @@ export function OrderGrid({ socketUrl, token }: Props) {
             { label: "+10 min — Requiere atención", colorVar: "sem-alert" },
             { label: "En tiempo", colorVar: "praline" },
           ].map(({ label, colorVar }) => (
-            <div key={label} className="flex items-center gap-1.5 text-[11px] text-[var(--muted-foreground)]">
+            <div
+              key={label}
+              className="flex items-center gap-1.5 text-[11px] text-[var(--muted-foreground)]"
+            >
               <span
                 aria-hidden
                 className="h-3.5 w-3.5 rounded"
@@ -74,12 +85,13 @@ export function OrderGrid({ socketUrl, token }: Props) {
               order={order}
               onStart={startOrder}
               onReady={markReady}
+              onOutOfStock={markOutOfStock}
             />
           ))
         )}
       </div>
     </main>
-  );
+  )
 }
 
 function EmptyState() {
@@ -89,8 +101,11 @@ function EmptyState() {
       aria-label="Sin pedidos activos"
       className="flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-[20px] border-2 border-dashed border-[var(--border)] text-[var(--muted-foreground)]"
     >
-      <InboxIcon className="size-9 stroke-[var(--border)] stroke-[1.4]" aria-hidden />
+      <InboxIcon
+        className="size-9 stroke-[var(--border)] stroke-[1.4]"
+        aria-hidden
+      />
       <p className="text-xs">Sin pedidos activos</p>
     </div>
-  );
+  )
 }
