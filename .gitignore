@@ -1,0 +1,15 @@
+# Claude Code workspace artifacts (per-developer)
+.claude/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -55,9 +55,10 @@ test("root / redirects to /orders or /login", async ({ page }) => {
 
 test.describe("Orders page — unauthenticated", () => {
   test("redirects to /login when not authenticated", async ({ page }) => {
-    // Clear any persisted auth state
+    // localStorage is only available on a real origin — navigate first, then clear.
     await page.context().clearCookies();
-    await page.evaluate(() => localStorage.clear());
+    await page.goto("/login");
+    await page.evaluate(() => window.localStorage.clear());
     await page.goto("/orders");
     await expect(page).toHaveURL(/\/login/);
   });
