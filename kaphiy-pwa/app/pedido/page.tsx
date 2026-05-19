@@ -281,7 +281,12 @@ export default function PedidoPage() {
       };
 
       const createdOrder = await createOrder(payload);
-      setConfirmedOrderId(createdOrder?.id ?? null);
+      const newOrderId = createdOrder?.id ?? null;
+      setConfirmedOrderId(newOrderId);
+      if (newOrderId) {
+        localStorage.setItem("last_order_id", String(newOrderId));
+      }
+      localStorage.removeItem("current_order");
       setConfirmed(true);
     } catch (err) {
       console.error(err);
@@ -299,10 +304,7 @@ export default function PedidoPage() {
 
   if (confirmed) {
     return <ConfirmationScreen total={total} orderId={confirmedOrderId} onBack={() => {
-      localStorage.removeItem("current_order");
-      localStorage.removeItem("chat_messages");
-      localStorage.removeItem("chat_session_id");
-      router.push("/inicio");
+      router.push("/mis-pedidos");
     }} />;
   }
 
