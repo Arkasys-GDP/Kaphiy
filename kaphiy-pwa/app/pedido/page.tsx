@@ -187,7 +187,6 @@ export default function PedidoPage() {
         const rawItems = parsed.cartItems || [];
         setAiNotes(parsed.aiNotes || []);
 
-        // Fetch real products to get accurate IDs, names and prices
         let realProducts: any[] = [];
         try {
           const apiProds = await getProducts();
@@ -197,7 +196,6 @@ export default function PedidoPage() {
         }
 
         const enrichedItems: OrderItem[] = rawItems.map((item: any, idx: number) => {
-          // Support all field name variants the n8n webhook may return
           const itemIdStr = String(item.id || item.productId || "");
           const itemNameRaw = item.productName || item.name || item.nombre || "";
           const itemNameStr = String(itemNameRaw).trim().toLowerCase();

@@ -1,18 +1,42 @@
 import { Message } from "@/types/chat";
 import Link from "next/link";
 
+function normalizeText(text: string): string {
+  return text
+    .replace(/\\n/g, "\n")   
+    .replace(/\n{3,}/g, "\n\n"); 
+}
+
 function parseBold(text: string) {
   const parts = text.split(/\*\*(.*?)\*\*/g);
   return parts.map((part, i) =>
     i % 2 === 1 ? (
-      <strong key={i} className="font-semibold">{part}</strong>
+      <strong key={i} style={{ fontWeight: 700 }}>{part}</strong>
     ) : (
       <span key={i}>{part}</span>
     )
   );
 }
 
+function renderLine(line: string, i: number) {
+  const isBullet = line.startsWith("- ") || line.startsWith("• ");
+  const content = isBullet ? line.slice(2) : line;
+
+  if (isBullet) {
+    return (
+      <span key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.4rem", marginTop: "0.15rem" }}>
+        <span style={{ flexShrink: 0, marginTop: "0.05em" }}>·</span>
+        <span>{parseBold(content)}</span>
+      </span>
+    );
+  }
+  return <span key={i}>{parseBold(line)}</span>;
+}
+
 export function AiBubble({ message }: { message: Message }) {
+  const normalized = normalizeText(message.text);
+  const lines = normalized.split("\n");
+
   return (
     <div className="chat-bubble-row chat-bubble-row--ai">
       <div className="chat-ai-avatar">
@@ -22,13 +46,13 @@ export function AiBubble({ message }: { message: Message }) {
       </div>
 
       <div className="chat-bubble chat-bubble--ai">
-        <p className="chat-bubble__text">
-          {message.text.split("\n").map((line, i) => (
-            <span key={i}>
-              {parseBold(line)}
-              {i < message.text.split("\n").length - 1 && <br />}
-            </span>
-          ))}
+        <p className="chat-bubble__text" style={{ display: "flex", flexDirection: "column", gap: "0.1rem" }}>
+          {lines.map((line, i) => {
+            if (line.trim() === "") {
+              return <span key={i} style={{ display: "block", height: "0.4rem" }} />;
+            }
+            return renderLine(line, i);
+          })}
         </p>
 
         {message.suggestions && (
@@ -71,3 +95,4 @@ export function UserBubble({ message }: { message: Message }) {
     </div>
   );
 }
+
