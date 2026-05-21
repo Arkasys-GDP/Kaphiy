@@ -26,6 +26,7 @@ export interface ApiProduct {
   price: number | string;
   aiDescription?: string;
   isAvailable: boolean;
+  imageUrl?: string;
   categoryId: number;
   category: ApiCategory;
   productIngredients: ApiProductIngredient[];
@@ -135,5 +136,6 @@ export function adaptProduct(p: ApiProduct) {
     sizes: [] as string[],
     temps: [] as string[],
     isAvailable: p.isAvailable,
+    imageUrl: p.imageUrl || undefined,
   };
 }

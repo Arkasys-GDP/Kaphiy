@@ -36,6 +36,7 @@ async function main() {
       price: 2.50,
       aiDescription: 'Latte suave con notas de caramelo.',
       isAvailable: true,
+      imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=1000',
       productIngredients: {
         create: [
           { ingredientId: ingLeche.id, isOptional: true },
@@ -52,6 +53,7 @@ async function main() {
       price: 4.00,
       aiDescription: 'Helado batido con base de vainilla.',
       isAvailable: true,
+      imageUrl: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?q=80&w=1000',
       productIngredients: {
         create: [
           { ingredientId: ingLeche.id, isOptional: false },

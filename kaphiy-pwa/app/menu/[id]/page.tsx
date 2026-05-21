@@ -69,16 +69,25 @@ export default function ProductDetailPage() {
   return (
     <div style={{ minHeight: "100dvh", background: "#EFE3D6", display: "flex", flexDirection: "column" }}>
       {/* Hero */}
-      <div style={{ background: "#EFE3D6", height: 260, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexShrink: 0 }}>
+      <div style={{ background: "#EFE3D6", height: 260, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", flexShrink: 0, overflow: "hidden" }}>
         <button
           onClick={() => router.back()}
           style={{ position: "absolute", top: "1rem", left: "1rem", width: 38, height: 38, borderRadius: 12, background: "rgba(255,249,244,0.85)", border: "1px solid #d8c8b8", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", backdropFilter: "blur(4px)", zIndex: 10 }}
         >
           <ChevronLeft size={20} color="#3e3b30" />
         </button>
-        <div style={{ fontSize: "5rem", lineHeight: 1, filter: "drop-shadow(0 8px 24px rgba(90,58,46,.2))" }}>
-          {product.emoji}
-        </div>
+        {product.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
+          />
+        ) : (
+          <div style={{ fontSize: "5rem", lineHeight: 1, filter: "drop-shadow(0 8px 24px rgba(90,58,46,.2))" }}>
+            {product.emoji}
+          </div>
+        )}
       </div>
 
       {/* Detail sheet */}

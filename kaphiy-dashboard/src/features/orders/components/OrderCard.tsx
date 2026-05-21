@@ -75,7 +75,7 @@ export function OrderCard({
 
   return (
     <article
-      aria-label={`Pedido ${order.orderID} — Mesa ${order.tableNumber}`}
+      aria-label={`Pedido ${order.orderNumber} — Mesa ${order.tableNumber}`}
       className={cn(
         "ticket-card relative mb-6 flex w-full flex-col break-inside-avoid",
         isAlert && "ring-2 ring-[var(--sem-alert)]/40",
@@ -103,7 +103,7 @@ export function OrderCard({
             <span className="order-number">{order.tableNumber}</span>
           </div>
           <p className="text-[11px] font-medium text-[var(--muted-foreground)]">
-            {order.orderID} · {order.paxCount} persona{order.paxCount !== 1 ? "s" : ""}
+            {order.orderNumber} · {order.paxCount} persona{order.paxCount !== 1 ? "s" : ""}
           </p>
           {/* Chips: kitchen status + payment status */}
           <div className="mt-1 flex flex-wrap items-center gap-1.5">

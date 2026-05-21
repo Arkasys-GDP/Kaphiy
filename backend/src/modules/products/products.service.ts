@@ -3,10 +3,32 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from '@prisma/client';
+import { v2 as cloudinary } from 'cloudinary';
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async uploadImage(file: any): Promise<string> {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'products',
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result.secure_url);
+        },
+      );
+      uploadStream.end(file.buffer);
+    });
+  }
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
     const { ingredients, categoryId, ...productData } = createProductDto;

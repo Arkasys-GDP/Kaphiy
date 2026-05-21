@@ -186,6 +186,7 @@ export function MenuContent() {
                   price={prod.price}
                   badges={prod.badges}
                   badgeTypes={prod.badgeTypes as any}
+                  imageUrl={prod.imageUrl}
                 />
               ))}
               {filtered.length === 0 && (
@@ -227,6 +228,7 @@ export function MenuContent() {
                         price={prod.price}
                         badges={prod.badges}
                         badgeTypes={prod.badgeTypes as any}
+                        imageUrl={prod.imageUrl}
                       />
                     ))}
                   </div>

@@ -15,7 +15,7 @@ const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000).toIS
 export const MOCK_ORDERS: Order[] = [
   {
     id: "41",
-    orderID: "#PED-0041",
+    orderNumber: "#PED-0041",
     tableId: "3",
     tableNumber: "3",
     paxCount: 1,
@@ -45,7 +45,7 @@ export const MOCK_ORDERS: Order[] = [
   },
   {
     id: "42",
-    orderID: "#PED-0042",
+    orderNumber: "#PED-0042",
     tableId: "7",
     tableNumber: "7",
     paxCount: 1,
@@ -75,7 +75,7 @@ export const MOCK_ORDERS: Order[] = [
   },
   {
     id: "43",
-    orderID: "#PED-0043",
+    orderNumber: "#PED-0043",
     tableId: "2",
     tableNumber: "2",
     paxCount: 1,
@@ -107,7 +107,7 @@ export const MOCK_STATS: OrderStats = {
 export const MOCK_HISTORY: Order[] = [
   {
     id: "38",
-    orderID: "#PED-0038",
+    orderNumber: "#PED-0038",
     tableId: "5",
     tableNumber: "5",
     paxCount: 1,

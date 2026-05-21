@@ -16,6 +16,7 @@ export interface Product {
   price: string | number; // Prisma Decimal serializes to string
   aiDescription?: string | null;
   isAvailable: boolean;
+  imageUrl?: string | null;
   productIngredients?: Array<{
     ingredientId: number;
     isOptional: boolean;

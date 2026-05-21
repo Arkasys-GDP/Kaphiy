@@ -14,6 +14,7 @@ export const productSchema = z.object({
     .max(9999.99, "Precio fuera de rango"),
   aiDescription: z.string().max(1000).optional().or(z.literal("")),
   isAvailable: z.boolean(),
+  imageUrl: z.string().url("Debe ser una URL válida").max(2048).optional().or(z.literal("")),
   ingredients: z.array(productIngredientLinkSchema),
 });
 

@@ -10,6 +10,7 @@ interface ProductListItemProps {
   price: number;
   badges?: string[];
   badgeTypes?: BadgeType[];
+  imageUrl?: string;
 }
 
 export function ProductListItem({
@@ -20,12 +21,33 @@ export function ProductListItem({
   price,
   badges = [],
   badgeTypes = [],
+  imageUrl,
 }: ProductListItemProps) {
   return (
     <Link href={`/menu/${id}`} style={{ textDecoration: "none" }}>
       <div className="product-list-item">
-        {/* Emoji icon */}
-        <div className="product-item__icon">{emoji}</div>
+        {/* Image/Emoji icon */}
+        <div 
+          className="product-item__icon" 
+          style={{ 
+            padding: imageUrl ? 0 : undefined, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            overflow: 'hidden' 
+          }}
+        >
+          {imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt={name}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            emoji
+          )}
+        </div>
 
         {/* Info */}
         <div style={{ flex: 1, minWidth: 0 }}>
