@@ -41,7 +41,6 @@ export function useChat() {
     let isNewSession = false;
 
     if (!sid || !uuidRegex.test(sid)) {
-      // No hay sesión o el ID guardado no es un UUID válido — generar uno nuevo
       sid = generateUUID();
       localStorage.setItem("chat_session_id", sid);
       isNewSession = true;
@@ -54,9 +53,7 @@ export function useChat() {
     } else {
       const savedMessages = localStorage.getItem("chat_messages");
       if (savedMessages) {
-        try {
-          setMessages(JSON.parse(savedMessages));
-        } catch (e) {}
+        try { setMessages(JSON.parse(savedMessages)); } catch (e) {}
       }
     }
     setIsInitialized(true);

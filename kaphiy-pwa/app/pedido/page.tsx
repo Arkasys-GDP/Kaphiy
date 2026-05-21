@@ -178,6 +178,12 @@ export default function PedidoPage() {
     async function loadOrderAndEnrich() {
       const saved = localStorage.getItem("current_order");
       if (!saved) {
+        // Si no hay carrito pero sí hay un pedido previo confirmado → redirigir
+        const lastOrderId = localStorage.getItem("last_order_id");
+        if (lastOrderId) {
+          router.replace("/mis-pedidos");
+          return;
+        }
         setLoading(false);
         return;
       }
@@ -284,7 +290,10 @@ export default function PedidoPage() {
       if (newOrderId) {
         localStorage.setItem("last_order_id", String(newOrderId));
       }
+      // Limpiar carrito y sesión de chat → fuerza chat nuevo limpio
       localStorage.removeItem("current_order");
+      localStorage.removeItem("chat_messages");
+      localStorage.removeItem("chat_session_id");
       setConfirmed(true);
     } catch (err) {
       console.error(err);

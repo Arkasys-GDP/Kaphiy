@@ -174,6 +174,19 @@ export default function MisPedidosPage() {
           <>
             <p className="section-label">PEDIDO ACTIVO</p>
             <ActiveOrderCard orderId={lastOrderId} />
+
+            {/* Botón nuevo pedido */}
+            <button
+              onClick={() => {
+                localStorage.removeItem("last_order_id");
+                localStorage.removeItem("current_order");
+                router.push("/chat");
+              }}
+              className="btn-secondary"
+              style={{ marginTop: "0.5rem" }}
+            >
+              ✦ Hacer otro pedido
+            </button>
           </>
         ) : (
           <div style={{
