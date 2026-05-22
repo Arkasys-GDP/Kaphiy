@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
 
 const MOCK_ORDER: Order = {
   id: "41",
-  orderID: "#PED-0041",
+  orderNumber: "#PED-0041",
   tableId: "3",
   tableNumber: "3",
   paxCount: 1,

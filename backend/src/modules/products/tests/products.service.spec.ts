@@ -37,6 +37,7 @@ const mockProduct: Product & { category: Category, ingredients: (ProductIngredie
     categoryId: 1,
     aiDescription: 'A coffee drink made with espresso and steamed milk.',
     legacyId: 123,
+    imageUrl: null,
     category: mockCategory,
     ingredients: [{
         productId: 1,

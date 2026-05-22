@@ -32,6 +32,13 @@ pnpm-debug.log*
 .env
 .env*.local
 
+# testing
+/coverage
+/playwright-report
+/playwright-system-report
+/test-results
+/playwright-system-results.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
