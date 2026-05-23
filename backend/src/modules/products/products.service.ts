@@ -7,7 +7,7 @@ import { v2 as cloudinary } from 'cloudinary';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async uploadImage(file: any): Promise<string> {
     cloudinary.config({
@@ -132,12 +132,12 @@ export class ProductsService {
 
   async remove(id: number): Promise<Product> {
     await this.findOne(id);
-    
+
     // Need to delete relations first from the join table
     await this.prisma.productIngredient.deleteMany({
-        where: { productId: id },
+      where: { productId: id },
     });
-    
+
     return this.prisma.product.delete({
       where: { id },
     });

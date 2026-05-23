@@ -23,10 +23,16 @@ export interface ApiProductIngredient {
 export interface ApiProduct {
   id: number;
   name: string;
+<<<<<<< HEAD
   price: number | string;
   aiDescription?: string;
   isAvailable: boolean;
   imageUrl?: string;
+=======
+  price: number | string; 
+  aiDescription?: string;
+  isAvailable: boolean;
+>>>>>>> claude/distracted-hopper-f93e7d
   categoryId: number;
   category: ApiCategory;
   productIngredients: ApiProductIngredient[];
@@ -35,7 +41,11 @@ export interface ApiProduct {
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
+<<<<<<< HEAD
     cache: "no-store",
+=======
+    cache: "no-store", 
+>>>>>>> claude/distracted-hopper-f93e7d
   });
   if (!res.ok) {
     throw new Error(`API error ${res.status} en ${path}`);
@@ -127,7 +137,11 @@ export function adaptProduct(p: ApiProduct) {
     categoryLabel: p.category?.name ?? "Menú",
     emoji,
     description: ingredientNames.join(" · ") || p.aiDescription || "",
+<<<<<<< HEAD
     price: parseFloat(String(p.price)),
+=======
+    price: parseFloat(String(p.price)), 
+>>>>>>> claude/distracted-hopper-f93e7d
     badges,
     badgeTypes,
     fullDescription: p.aiDescription ?? `${p.name} de Praliné Coffee House.`,
@@ -136,6 +150,9 @@ export function adaptProduct(p: ApiProduct) {
     sizes: [] as string[],
     temps: [] as string[],
     isAvailable: p.isAvailable,
+<<<<<<< HEAD
     imageUrl: p.imageUrl || undefined,
+=======
+>>>>>>> claude/distracted-hopper-f93e7d
   };
 }

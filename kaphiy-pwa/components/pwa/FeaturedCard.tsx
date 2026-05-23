@@ -27,7 +27,7 @@ export function FeaturedCard({
   return (
     <Link href={`/menu/${id}`} className="featured-card">
       {/* Image area */}
-      <div 
+      <div
         className="featured-card__image"
         style={{
           display: "flex",
@@ -47,7 +47,7 @@ export function FeaturedCard({
         ) : (
           <span style={{ fontSize: "2rem" }}>{emoji}</span>
         )}
-        <span 
+        <span
           className={`featured-card__label featured-card__label--${labelType}`}
           style={{ zIndex: 1 }}
         >

@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import { Home, BookOpen, ShoppingBag } from "lucide-react";
 
 const TABS = [
-  { href: "/inicio",       label: "Inicio",   Icon: Home        },
-  { href: "/menu",         label: "Menú",     Icon: BookOpen    },
-  { href: "/mis-pedidos",  label: "Pedidos",  Icon: ShoppingBag },
+  { href: "/inicio", label: "Inicio", Icon: Home },
+  { href: "/menu", label: "Menú", Icon: BookOpen },
+  { href: "/mis-pedidos", label: "Pedidos", Icon: ShoppingBag },
 ] as const;
 
 export function BottomNav() {

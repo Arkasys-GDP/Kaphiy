@@ -27,14 +27,14 @@ export function ProductListItem({
     <Link href={`/menu/${id}`} style={{ textDecoration: "none" }}>
       <div className="product-list-item">
         {/* Image/Emoji icon */}
-        <div 
-          className="product-item__icon" 
-          style={{ 
-            padding: imageUrl ? 0 : undefined, 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            overflow: 'hidden' 
+        <div
+          className="product-item__icon"
+          style={{
+            padding: imageUrl ? 0 : undefined,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden'
           }}
         >
           {imageUrl ? (

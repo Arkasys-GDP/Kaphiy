@@ -18,33 +18,33 @@ const mockPrismaService = {
 };
 
 const mockCategory: Category = {
-    id: 1,
-    name: 'Coffee',
-    isActive: true,
+  id: 1,
+  name: 'Coffee',
+  isActive: true,
 };
 
 const mockIngredient: Ingredient = {
-    id: 1,
-    name: 'Milk',
-    isAllergen: false,
+  id: 1,
+  name: 'Milk',
+  isAllergen: false,
 };
 
 const mockProduct: Product & { category: Category, ingredients: (ProductIngredient & { ingredient: Ingredient })[] } = {
-    id: 1,
-    name: 'Latte',
-    price: new Prisma.Decimal(3.50),
-    isAvailable: true,
-    categoryId: 1,
-    aiDescription: 'A coffee drink made with espresso and steamed milk.',
-    legacyId: 123,
-    imageUrl: null,
-    category: mockCategory,
-    ingredients: [{
-        productId: 1,
-        ingredientId: 1,
-        isOptional: false,
-        ingredient: mockIngredient
-    }]
+  id: 1,
+  name: 'Latte',
+  price: new Prisma.Decimal(3.50),
+  isAvailable: true,
+  categoryId: 1,
+  aiDescription: 'A coffee drink made with espresso and steamed milk.',
+  legacyId: 123,
+  imageUrl: null,
+  category: mockCategory,
+  ingredients: [{
+    productId: 1,
+    ingredientId: 1,
+    isOptional: false,
+    ingredient: mockIngredient
+  }]
 };
 
 describe('ProductsService', () => {
@@ -70,64 +70,64 @@ describe('ProductsService', () => {
 
   describe('create', () => {
     it('should create a product', async () => {
-        mockPrismaService.product.create.mockResolvedValue(mockProduct);
-        const result = await service.create({
-            name: 'Latte',
-            price: 3.50,
-            categoryId: 1,
-            ingredients: [{ ingredientId: 1, isOptional: false }]
-        });
-        expect(result).toEqual(mockProduct);
+      mockPrismaService.product.create.mockResolvedValue(mockProduct);
+      const result = await service.create({
+        name: 'Latte',
+        price: 3.50,
+        categoryId: 1,
+        ingredients: [{ ingredientId: 1, isOptional: false }]
+      });
+      expect(result).toEqual(mockProduct);
     });
   });
 
   describe('findAll', () => {
     it('should return an array of products', async () => {
-        mockPrismaService.product.findMany.mockResolvedValue([mockProduct]);
-        const result = await service.findAll();
-        expect(result).toEqual([mockProduct]);
+      mockPrismaService.product.findMany.mockResolvedValue([mockProduct]);
+      const result = await service.findAll();
+      expect(result).toEqual([mockProduct]);
     });
   });
 
   describe('findOne', () => {
     it('should return a product', async () => {
-        mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
-        const result = await service.findOne(1);
-        expect(result).toEqual(mockProduct);
+      mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+      const result = await service.findOne(1);
+      expect(result).toEqual(mockProduct);
     });
 
     it('should throw a NotFoundException if product is not found', async () => {
-        mockPrismaService.product.findUnique.mockResolvedValue(null);
-        await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
+      mockPrismaService.product.findUnique.mockResolvedValue(null);
+      await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
     });
   });
 
-    describe('update', () => {
-        it('should update a product', async () => {
-            mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
-            mockPrismaService.product.update.mockResolvedValue(mockProduct);
-            const result = await service.update(1, { name: 'Updated Product' });
-            expect(result).toEqual(mockProduct);
-        });
-
-        it('should throw a NotFoundException if product to update is not found', async () => {
-            mockPrismaService.product.findUnique.mockResolvedValue(null);
-            await expect(service.update(1, { name: 'Updated Product' })).rejects.toThrow(NotFoundException);
-        });
+  describe('update', () => {
+    it('should update a product', async () => {
+      mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+      mockPrismaService.product.update.mockResolvedValue(mockProduct);
+      const result = await service.update(1, { name: 'Updated Product' });
+      expect(result).toEqual(mockProduct);
     });
 
-    describe('remove', () => {
-        it('should delete a product', async () => {
-            mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
-            mockPrismaService.productIngredient.deleteMany.mockResolvedValue({ count: 1 });
-            mockPrismaService.product.delete.mockResolvedValue(mockProduct);
-            const result = await service.remove(1);
-            expect(result).toEqual(mockProduct);
-        });
-
-        it('should throw a NotFoundException if product to delete is not found', async () => {
-            mockPrismaService.product.findUnique.mockResolvedValue(null);
-            await expect(service.remove(1)).rejects.toThrow(NotFoundException);
-        });
+    it('should throw a NotFoundException if product to update is not found', async () => {
+      mockPrismaService.product.findUnique.mockResolvedValue(null);
+      await expect(service.update(1, { name: 'Updated Product' })).rejects.toThrow(NotFoundException);
     });
+  });
+
+  describe('remove', () => {
+    it('should delete a product', async () => {
+      mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+      mockPrismaService.productIngredient.deleteMany.mockResolvedValue({ count: 1 });
+      mockPrismaService.product.delete.mockResolvedValue(mockProduct);
+      const result = await service.remove(1);
+      expect(result).toEqual(mockProduct);
+    });
+
+    it('should throw a NotFoundException if product to delete is not found', async () => {
+      mockPrismaService.product.findUnique.mockResolvedValue(null);
+      await expect(service.remove(1)).rejects.toThrow(NotFoundException);
+    });
+  });
 });
