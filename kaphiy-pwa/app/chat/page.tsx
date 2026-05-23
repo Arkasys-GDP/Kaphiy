@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useChat } from "@/hooks/useChat";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatInput } from "@/components/chat/ChatInput";
@@ -25,14 +25,21 @@ function ChatContent() {
 
   const searchParams = useSearchParams();
   const msg = searchParams.get("msg");
-  const hasSentRef = useRef(false);
+  const router = useRouter();
 
   useEffect(() => {
-    if (isInitialized && msg && !hasSentRef.current) {
-      hasSentRef.current = true;
-      handleSend(msg);
-    }
-  }, [isInitialized, msg, handleSend]);
+    if (!isInitialized || !msg) return;
+
+    // Clave única por mensaje para no reenviarlo si el componente se re-monta
+    const sentKey = `msg_sent_${msg}`;
+    if (sessionStorage.getItem(sentKey)) return;
+
+    sessionStorage.setItem(sentKey, "1");
+    handleSend(msg);
+
+    // Limpiar el ?msg= de la URL para que al navegar atrás no se reenvíe
+    router.replace("/chat", { scroll: false });
+  }, [isInitialized, msg]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="chat-screen">

@@ -166,6 +166,7 @@ export default function InicioPage() {
                 price={rec.product.price}
                 label={rec.label}
                 labelType={rec.labelType}
+                imageUrl={rec.product.imageUrl}
               />
             ))
           ) : !error && (
@@ -199,6 +200,7 @@ export default function InicioPage() {
                 price={item.price}
                 badges={item.badges}
                 badgeTypes={item.badgeTypes as any}
+                imageUrl={item.imageUrl}
               />
             ))
           ) : !error && (

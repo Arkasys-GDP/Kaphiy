@@ -63,10 +63,10 @@ export function useDeleteProduct() {
     onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
   });
 }
-
 /** Trim empty optional fields before sending to backend. */
 function serialize(input: Partial<ProductInput>): unknown {
   const out: Record<string, unknown> = { ...input };
   if (out.aiDescription === "") out.aiDescription = undefined;
+  if (out.imageUrl === "") out.imageUrl = undefined;
   return out;
 }

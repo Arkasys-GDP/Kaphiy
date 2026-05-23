@@ -56,7 +56,7 @@ export class OrdersService {
     private readonly prisma: PrismaService,
     private readonly gateway: KitchenGateway,
     private readonly kitchen: KitchenService,
-  ) {}
+  ) { }
 
   // ── Public endpoints ──────────────────────────────────────
 
@@ -318,16 +318,16 @@ export class OrdersService {
         table: tableId ? { connect: { id: tableId } } : undefined,
         orderItems: items
           ? {
-              create: items.map((item) => {
-                const product = products.find((p) => p.id === item.productId)!;
-                return {
-                  quantity: item.quantity,
-                  unitPrice: product.price,
-                  aiNotes: item.aiNotes,
-                  product: { connect: { id: item.productId } },
-                };
-              }),
-            }
+            create: items.map((item) => {
+              const product = products.find((p) => p.id === item.productId)!;
+              return {
+                quantity: item.quantity,
+                unitPrice: product.price,
+                aiNotes: item.aiNotes,
+                product: { connect: { id: item.productId } },
+              };
+            }),
+          }
           : undefined,
       },
       include: { orderItems: { include: { product: true } }, table: true },

@@ -8,10 +8,14 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -43,6 +47,21 @@ export class ProductsController {
   }
 
   // Writes require admin auth (barista JWT)
+
+  @Post('upload')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Upload product image to Cloudinary (admin)' })
+  @ApiResponse({ status: 201, description: 'Return upload response with image URL' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async uploadImage(@UploadedFile() file: any) {
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+    const url = await this.productsService.uploadImage(file);
+    return { url };
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)

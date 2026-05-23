@@ -35,6 +35,10 @@ export class CreateProductDto {
   isAvailable?: boolean;
 
   @IsOptional()
+  @IsString()
+  imageUrl?: string;
+
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ProductIngredientDto)

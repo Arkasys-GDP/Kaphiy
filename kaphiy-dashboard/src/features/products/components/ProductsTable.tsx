@@ -172,6 +172,7 @@ export function ProductsTable() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[80px]">Imagen</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>Categoría</TableHead>
               <TableHead className="text-right">Precio</TableHead>
@@ -185,7 +186,7 @@ export function ProductsTable() {
               <>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell colSpan={6}>
+                    <TableCell colSpan={7}>
                       <Skeleton className="h-6 w-full" />
                     </TableCell>
                   </TableRow>
@@ -196,7 +197,7 @@ export function ProductsTable() {
             {productsQuery.isError && (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   className="text-center text-sm text-[var(--sem-alert)]"
                 >
                   Error al cargar productos.{" "}
@@ -215,7 +216,7 @@ export function ProductsTable() {
               filtered.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={7}
                     className="py-8 text-center text-sm text-[var(--muted-foreground)]"
                   >
                     {search
@@ -232,6 +233,22 @@ export function ProductsTable() {
                   ?.map((pi) => pi.ingredient!.name) ?? []
               return (
                 <TableRow key={p.id}>
+                  <TableCell>
+                    {p.imageUrl ? (
+                      <div className="relative h-10 w-10 overflow-hidden rounded-md border border-[var(--border)] bg-zinc-950/10">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={p.imageUrl}
+                          alt={p.name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-10 w-10 items-center justify-center rounded-md border border-[var(--border)] bg-[var(--background)] text-lg">
+                        ☕
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell className="text-[var(--muted-foreground)]">
                     {categoryName(p.categoryId)}

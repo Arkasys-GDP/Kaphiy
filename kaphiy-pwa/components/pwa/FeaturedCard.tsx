@@ -11,6 +11,7 @@ interface FeaturedCardProps {
   price: number;
   label: string;
   labelType: LabelType;
+  imageUrl?: string;
 }
 
 export function FeaturedCard({
@@ -21,13 +22,35 @@ export function FeaturedCard({
   price,
   label,
   labelType,
+  imageUrl,
 }: FeaturedCardProps) {
   return (
     <Link href={`/menu/${id}`} className="featured-card">
       {/* Image area */}
-      <div className="featured-card__image">
-        {emoji}
-        <span className={`featured-card__label featured-card__label--${labelType}`}>
+      <div 
+        className="featured-card__image"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+          position: "relative",
+        }}
+      >
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl}
+            alt={name}
+            style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
+          />
+        ) : (
+          <span style={{ fontSize: "2rem" }}>{emoji}</span>
+        )}
+        <span 
+          className={`featured-card__label featured-card__label--${labelType}`}
+          style={{ zIndex: 1 }}
+        >
           {label}
         </span>
       </div>

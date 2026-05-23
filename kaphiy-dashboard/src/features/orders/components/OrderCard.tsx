@@ -102,7 +102,7 @@ export function OrderCard({
             </span>
             <span className="order-number">{order.tableNumber}</span>
           </div>
-          <p className="text-[11px] font-medium text-muted-foreground">
+          <p className="text-[11px] font-medium text-[var(--muted-foreground)]">
             {order.orderNumber} · {order.paxCount} persona{order.paxCount !== 1 ? "s" : ""}
           </p>
           {/* Chips: kitchen status + payment status */}
@@ -111,11 +111,11 @@ export function OrderCard({
               className={cn(
                 "inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide",
                 order.status === "PENDING" &&
-                  "bg-[color-mix(in_oklch,var(--crema)_45%,transparent)] text-ink",
+                "bg-[color-mix(in_oklch,var(--crema)_45%,transparent)] text-ink",
                 order.status === "IN_PREP" &&
-                  "bg-[color-mix(in_oklch,var(--praline)_18%,transparent)] text-praline",
+                "bg-[color-mix(in_oklch,var(--praline)_18%,transparent)] text-praline",
                 order.status === "READY" &&
-                  "bg-[color-mix(in_oklch,var(--sem-ok)_20%,transparent)] text-sem-ok",
+                "bg-[color-mix(in_oklch,var(--sem-ok)_20%,transparent)] text-sem-ok",
               )}
             >
               {order.status === "PENDING" && "Pendiente"}
@@ -171,9 +171,9 @@ export function OrderCard({
               "active:translate-y-0.5",
               "focus-visible:outline-2 focus-visible:outline-praline",
               order.status === "IN_PREP" &&
-                "border-sem-ok bg-[color-mix(in_oklch,var(--sem-ok)_10%,transparent)] text-sem-ok hover:bg-sem-ok hover:text-white",
+              "border-sem-ok bg-[color-mix(in_oklch,var(--sem-ok)_10%,transparent)] text-sem-ok hover:bg-sem-ok hover:text-white",
               order.status === "READY" &&
-                "border-praline bg-praline text-paper hover:brightness-110",
+              "border-praline bg-praline text-paper hover:brightness-110",
             )}
           >
             <ActionIcon className="size-4.5" aria-hidden />

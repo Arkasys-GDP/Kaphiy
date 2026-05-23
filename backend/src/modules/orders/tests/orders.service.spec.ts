@@ -3,6 +3,8 @@ import { OrdersService } from '../orders.service';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { Order, Product, Table, OrderItem, PaymentStatus, KitchenStatus, TableStatus, Prisma } from '@prisma/client';
+import { KitchenGateway } from '../../kitchen/kitchen.gateway';
+import { KitchenService } from '../../kitchen/kitchen.service';
 
 const mockPrismaService = {
   order: {
@@ -26,7 +28,7 @@ const mockTable: Table = {
     status: TableStatus.Available,
 };
 
-const mockProduct: Product = {
+const mockProduct: any = {
     id: 1,
     name: 'Latte',
     price: new Prisma.Decimal(3.50),
@@ -34,6 +36,8 @@ const mockProduct: Product = {
     categoryId: 1,
     aiDescription: null,
     legacyId: null,
+    imageUrl: null,
+    productIngredients: [],
 };
 
 const mockOrderItem: OrderItem & { product: Product } = {
@@ -56,7 +60,7 @@ const mockOrder: any = {
     kitchenStatus: KitchenStatus.WAITING,
     createdAt: new Date(),
     table: mockTable,
-    items: [mockOrderItem],
+    orderItems: [mockOrderItem],
 };
 
 describe('OrdersService', () => {
@@ -69,6 +73,26 @@ describe('OrdersService', () => {
         {
           provide: PrismaService,
           useValue: mockPrismaService,
+        },
+        {
+          provide: KitchenGateway,
+          useValue: {
+            emitStatusChanged: jest.fn(),
+            emitStats: jest.fn(),
+            emitNewOrder: jest.fn(),
+          },
+        },
+        {
+          provide: KitchenService,
+          useValue: {
+            getActiveOrders: jest.fn().mockResolvedValue([]),
+            getStats: jest.fn().mockResolvedValue({
+              inPrep: 0,
+              alerts: 0,
+              completedToday: 0,
+              avgTimeMinutes: 0,
+            }),
+          },
         },
       ],
     }).compile();

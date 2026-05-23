@@ -17,6 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { toast } from "sonner"
+import { useAuthStore } from "@/src/features/auth/store/authSlice"
 import { useCategoriesQuery } from "@/src/features/categories/hooks/useCategories"
 import { useIngredientsQuery } from "@/src/features/ingredients/hooks/useIngredients"
 import { productSchema, type ProductInput } from "../lib/schema"
@@ -37,6 +39,40 @@ export function ProductForm({
 }: Props) {
   const { data: categories = [] } = useCategoriesQuery()
   const { data: ingredients = [] } = useIngredientsQuery()
+  const token = useAuthStore((s) => s.token)
+  const [uploading, setUploading] = useState(false)
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    const formData = new FormData()
+    formData.append("file", file)
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/products/upload`, {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      })
+
+      if (!res.ok) {
+        throw new Error("Failed to upload image")
+      }
+
+      const data = await res.json()
+      form.setValue("imageUrl", data.url, { shouldDirty: true })
+      toast.success("Imagen subida con éxito")
+    } catch (error) {
+      console.error(error)
+      toast.error("Error al subir la imagen. Por favor, intenta de nuevo.")
+    } finally {
+      setUploading(false)
+    }
+  }
 
   const initialIngredients = useMemo(
     () =>
@@ -55,6 +91,7 @@ export function ProductForm({
       price: defaultValues ? Number(defaultValues.price) : 0,
       aiDescription: defaultValues?.aiDescription ?? "",
       isAvailable: defaultValues?.isAvailable ?? true,
+      imageUrl: defaultValues?.imageUrl ?? "",
       ingredients: initialIngredients,
     },
   })
@@ -180,6 +217,81 @@ export function ProductForm({
           rows={2}
           placeholder="Notas para el agente IA — sabores, sugerencias…"
         />
+      </div>
+
+      {/* Sección de Imagen */}
+      <div className="flex flex-col gap-1.5">
+        <Label>Imagen del Producto</Label>
+        <div className="flex flex-col gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
+          <Controller
+            control={form.control}
+            name="imageUrl"
+            render={({ field }) => (
+              <div className="flex flex-col gap-3">
+                {field.value ? (
+                  <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-[var(--border)] bg-zinc-950/20">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={field.value}
+                      alt="Vista previa del producto"
+                      className="h-full w-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 h-8 w-8 p-0 rounded-full"
+                      onClick={() => field.onChange("")}
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <label className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[var(--border)] bg-[var(--background)] hover:border-amber-500/50 hover:bg-amber-500/5 transition-all">
+                    {uploading ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+                        <span className="text-xs text-[var(--muted-foreground)]">Subiendo imagen...</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 text-[var(--muted-foreground)]">
+                        <Plus className="h-8 w-8" />
+                        <span className="text-xs">Selecciona una imagen del producto</span>
+                        <span className="text-[10px] text-zinc-500">PNG, JPG hasta 5MB</span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileChange}
+                      disabled={uploading}
+                    />
+                  </label>
+                )}
+                
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="prod-image-url" className="text-xs text-[var(--muted-foreground)]">
+                    O ingresa la URL de la imagen directamente:
+                  </Label>
+                  <Input
+                    id="prod-image-url"
+                    type="url"
+                    placeholder="https://ejemplo.com/imagen.jpg"
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    disabled={uploading}
+                  />
+                  {form.formState.errors.imageUrl && (
+                    <p role="alert" className="text-xs text-[var(--sem-alert)]">
+                      {form.formState.errors.imageUrl.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          />
+        </div>
       </div>
 
       <div className="flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3">

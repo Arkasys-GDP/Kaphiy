@@ -35,7 +35,9 @@ pnpm-debug.log*
 
 # tests
 /playwright-report
+/playwright-system-report
 /test-results
+/playwright-system-results.json
 /.vitest-cache
 
 # typescript
