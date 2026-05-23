@@ -1,4 +1,3 @@
-
 # ☕ KAPHIY Backend API
 
 Backend del sistema de pedidos web **KAPHIY** para Praliné Coffee House.  
@@ -10,185 +9,76 @@ Desarrollado con **NestJS**, diseñado bajo una arquitectura escalable, modular 
 
 Este proyecto implementa una API REST para gestionar:
 
-- Productos (menú)
-- Pedidos
-- Detalles de pedidos
+- Productos y Menú Categorizado
+- Pedidos y órdenes de atención
+- Gestión de ingredientes
 
-El sistema está diseñado para integrarse con un frontend tipo **PWA (Next.js)** y permitir pedidos mediante código QR, priorizando una experiencia de usuario rápida y sin fricción.
+El sistema está diseñado para integrarse con un frontend web y permitir pedidos mediante código QR, incorporando una arquitectura preparada para una IA autónoma (Gemini + n8n).
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-- **Framework:** NestJS
+- **Framework:** NestJS 11
 - **Lenguaje:** TypeScript
 - **Base de datos:** PostgreSQL (Neon Serverless)
-- **ORM:** Prisma
+- **ORM:** Prisma (v7.7.0) con `@prisma/adapter-pg`
 - **Validación:** class-validator
-- **Configuración:** @nestjs/config
+- **Documentación:** Swagger OpenAPI (`/api`)
 
 ---
 
-## ⚙️ Instalación del proyecto
+## ⚙️ Pasos de Instalación para el Equipo
 
+Si acabas de clonar el repositorio, sigue estos pasos estrictamente para que tu entorno levante sin errores:
+
+### 1. Instalar dependencias
 ```bash
 npm install
-````
-
----
-
-## 🔐 Variables de entorno
-
-Crea un archivo `.env` en la raíz del proyecto:
-
-```env
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?sslmode=require"
 ```
 
-📌 Nota:
+### 2. Variables de Entorno
+Crea un archivo `.env` en la raíz del proyecto. **Solicita la URL de la base de datos al administrador.**
 
-* Este archivo **NO debe subirse al repositorio**
-* Usa `.env.example` como referencia
+```env
+DATABASE_URL="postgresql://USUARIO:PASSWORD@HOST/DATABASE?sslmode=require"
+```
+
+### 3. Sincronizar Prisma y Generar Cliente
+Este proyecto usa Prisma como fuente de la verdad para la DB. Ejecuta:
+```bash
+npx prisma db push
+npx prisma generate
+```
+*(Nota: Nunca uses `prisma db pull` si ves que tus tablas entran en conflicto, la estructura real ya cuenta con `@map` a `snake_case` integrados).*
+
+### 4. Cargar Datos de Prueba (Seeder)
+Si la base de datos está vacía, puedes ejecutar el siguiente comando para llenar productos, ingredientes y mesas iniciales:
+```bash
+npx prisma db seed
+```
 
 ---
 
 ## ▶️ Ejecución del proyecto
 
 ```bash
-# desarrollo
+# Servidor de Desarrollo
 npm run start:dev
 
-# producción
+# Producción
+npm run build
 npm run start:prod
 ```
 
----
-
-## 🗄️ Base de datos (Prisma + Neon)
-
-Este proyecto utiliza Prisma en modo **Database First**, es decir:
-
-👉 La base de datos ya fue creada previamente mediante SQL.
-
-### Sincronizar Prisma con la BD (ya la tenemos sincronizada solamente colocar el URL en el env)
-
-```bash
-npx prisma db pull
-npx prisma generate
-```
-
-📌 Importante:
-
-* ❌ No usar `prisma migrate`
-* ✔ Solo usar `db pull` para sincronizar
+Una vez que el servidor esté corriendo, puedes ver toda la documentación y endpoints entrando a:  
+👉 **http://localhost:3000/api** (Swagger UI)
 
 ---
 
-## 📦 Estructura Futura del proyecto (Puede variar aún no estan creadas las carpetas)
+## 🤖 Agente IA (Configuración n8n)
 
-```
-src/
- ├── prisma/        # Configuración de Prisma
- ├── product/       # Módulo de productos
- ├── order/         # Módulo de pedidos
- ├── app.module.ts
- └── main.ts
-
-prisma/
- └── schema.prisma
-```
+Para permitir que el asistente virtual Kaphiy opere sobre Postgres:
+Al actualizar la base de datos, entra a tu gestor SQL o ejecuta el script en `prisma/n8n_grants.sql` para forzar las reglas de solo lectura y blindar el sistema.
 
 ---
-
-## 🔌 Endpoints iniciales
-
-### Productos
-
-```
-GET /product
-POST /product
-```
-
-### Pedidos
-
-```
-POST /order
-```
-
----
-
-## 🧪 Validaciones
-
-Se utilizan DTOs con:
-
-* `class-validator`
-* `class-transformer`
-
-Ejemplo:
-
-```ts
-export class CreateProductDto {
-  name: string;
-  price: number;
-}
-```
-
----
-
-## 🌐 CORS
-
-El backend tiene CORS habilitado para permitir conexión con el frontend.
-
----
-
-## 🚀 Estado del proyecto
-
-🔧 En desarrollo (MVP)
-
----
-
-## 📈 Próximas mejoras
-
-* Autenticación (JWT)
-* Integración con IA (Gemini)
-* Procesamiento de voz (Whisper)
-* Orquestación con n8n
-* Documentación con Swagger
-* Contenedorización con Docker
-
----
-
-## 🐳 Docker (próximamente)
-
-El proyecto será preparado para ejecutarse en contenedores Docker, permitiendo:
-
-* Entornos consistentes
-* Despliegue sencillo en la nube
-* Escalabilidad
-
----
-
-## 👥 Equipo
-
-Proyecto desarrollado por el equipo de KAPHIY (ARKASYS):
-
-* Backend
-* Frontend
-* IA / Documentación
-* Gestión
-
----
-
-## 📄 Licencia
-
-Este proyecto es de uso académico.
-
----
-
-## 💬 Nota final
-
-Este backend está siendo construido siguiendo buenas prácticas de:
-
-* Arquitectura modular
-* Separación de responsabilidades
-* Escalabilidad futura

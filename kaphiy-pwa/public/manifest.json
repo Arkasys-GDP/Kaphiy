@@ -1,0 +1,21 @@
+{
+  "name": "Kaphiy PWA",
+  "short_name": "Kaphiy",
+  "description": "PWA para la gestión de pedidos de café",
+  "start_url": "/inicio",
+  "display": "standalone",
+  "background_color": "#EFE3D6",
+  "theme_color": "#565243",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

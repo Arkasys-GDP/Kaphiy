@@ -1,82 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider   = "prisma-client-js"
+  //output     = "../src/generated/prisma"
+  engineType = "library"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-model categories {
-  id        Int        @id @default(autoincrement())
-  name      String     @db.VarChar(255)
-  is_active Boolean?   @default(true)
-  products  products[]
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @db.VarChar(255)
+  isActive Boolean   @default(true) @map("is_active")
+  products Product[]
+
+  @@map("categories")
 }
 
-model ingredients {
-  id                  Int                   @id @default(autoincrement())
-  name                String                @db.VarChar(255)
-  is_allergen         Boolean?              @default(false)
-  product_ingredients product_ingredients[]
+model Table {
+  id        Int         @id @default(autoincrement())
+  tableName String      @map("table_name") @db.VarChar(255)
+  status    TableStatus @default(Available)
+  orders    Order[]
+
+  @@map("tables")
 }
 
-model n8n_chat_histories {
-  id         Int    @id @default(autoincrement())
-  session_id String @db.VarChar(255)
-  message    Json
+model Ingredient {
+  id                 Int                 @id @default(autoincrement())
+  name               String              @db.VarChar(255)
+  isAllergen         Boolean             @default(false) @map("is_allergen")
+  productIngredients ProductIngredient[]
+
+  @@map("ingredients")
 }
 
-model order_items {
-  id         Int       @id @default(autoincrement())
-  order_id   Int?
-  product_id Int?
-  quantity   Int       @default(1)
-  unit_price Decimal   @db.Decimal(10, 2)
-  ai_notes   String?
-  orders     orders?   @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  products   products? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Product {
+  id                 Int                 @id @default(autoincrement())
+  legacyId           Int?                @map("legacy_id")
+  categoryId         Int                 @map("category_id")
+  name               String              @db.VarChar(255)
+  aiDescription      String?             @map("ai_description") @db.Text
+  price              Decimal             @db.Decimal(10, 2)
+  isAvailable        Boolean             @default(true) @map("is_available")
+  category           Category            @relation(fields: [categoryId], references: [id])
+  productIngredients ProductIngredient[]
+  orderItems         OrderItem[]
+
+  @@map("products")
 }
 
-model orders {
-  id              Int           @id @default(autoincrement())
-  table_id        Int?
-  chat_session_id String?       @db.Uuid
-  payment_code    String?       @db.VarChar(6)
-  total           Decimal?      @db.Decimal(10, 2)
-  payment_status  String?       @default("PENDING") @db.VarChar(50)
-  kitchen_status  String?       @default("WAITING") @db.VarChar(50)
-  created_at      DateTime?     @default(now()) @db.Timestamp(6)
-  order_items     order_items[]
-  tables          tables?       @relation(fields: [table_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Order {
+  id            Int           @id @default(autoincrement())
+  tableId       Int           @map("table_id")
+  chatSessionId String?       @map("chat_session_id") @db.Uuid
+  paymentCode   String?       @map("payment_code") @db.VarChar(6)
+  total         Decimal?      @db.Decimal(10, 2)
+  paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
+  kitchenStatus KitchenStatus @default(WAITING) @map("kitchen_status")
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt     DateTime?     @map("deleted_at") @db.Timestamptz(6)
+  table         Table         @relation(fields: [tableId], references: [id])
+  orderItems    OrderItem[]
+
+  @@map("orders")
 }
 
-model product_ingredients {
-  product_id    Int
-  ingredient_id Int
-  is_optional   Boolean?    @default(false)
-  ingredients   ingredients @relation(fields: [ingredient_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  products      products    @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model ProductIngredient {
+  productId    Int        @map("product_id")
+  ingredientId Int        @map("ingredient_id")
+  isOptional   Boolean    @default(false) @map("is_optional")
+  product      Product    @relation(fields: [productId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
 
-  @@id([product_id, ingredient_id])
+  @@id([productId, ingredientId])
+  @@map("product_ingredients")
 }
 
-model products {
-  id                  Int                   @id @default(autoincrement())
-  legacy_id           Int?
-  category_id         Int?
-  name                String                @db.VarChar(255)
-  ai_description      String?
-  price               Decimal               @db.Decimal(10, 2)
-  is_available        Boolean?              @default(true)
-  order_items         order_items[]
-  product_ingredients product_ingredients[]
-  categories          categories?           @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int     @map("order_id")
+  productId Int     @map("product_id")
+  quantity  Int     @default(1)
+  unitPrice Decimal @map("unit_price") @db.Decimal(10, 2)
+  aiNotes   String? @map("ai_notes") @db.Text
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
 }
 
-model tables {
-  id         Int      @id @default(autoincrement())
-  table_name String   @db.VarChar(255)
-  status     String?  @default("Available") @db.VarChar(50)
-  orders     orders[]
+enum TableStatus {
+  Available
+  Occupied
+  Reserved
+}
+
+enum PaymentStatus {
+  PENDING @map("UNPAID")
+  PAID
+  CANCELLED
+}
+
+enum KitchenStatus {
+  WAITING @map("QUEUE")
+  PREPARING
+  READY
+  DELIVERED
+  OUT_OF_STOCK
+}
+
+model Barista {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  pinHash   String   @map("pin_hash") @db.VarChar(255)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("baristas")
+}
+
+model N8nChatHistory {
+  id        Int    @id @default(autoincrement())
+  sessionId String @map("session_id") @db.VarChar(255)
+  message   Json
+
+  @@map("n8n_chat_histories")
+}
+
+model N8nVector {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  content   String?  @db.Text
+  metadata  Json?    @db.JsonB
+  embedding Unsupported("vector")?
+
+  @@map("n8n_vectors")
 }

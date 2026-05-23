@@ -1,30 +1,43 @@
-import { Geist, Geist_Mono, Public_Sans } from "next/font/google"
-
-import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import { Playfair_Display, Inter } from "next/font/google";
+import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const publicSans = Public_Sans({subsets:['latin'],variable:'--font-sans'})
-
-const fontMono = Geist_Mono({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-mono",
-})
+  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  weight: ["400", "500", "600", "700"],
+});
+
+export const metadata = {
+  title: "Praliné Coffee House · KAPHIY",
+  description:
+    "Realiza tu pedido en Praliné Coffee House. Experiencia digital sin fricción, directamente desde tu mesa.",
+  manifest: "/manifest.json",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#EFE3D6",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", publicSans.variable)}
-    >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
+    <html lang="es" className={cn(playfair.variable, inter.variable)}>
+      <body className="antialiased font-sans">
+        <div className="praline-container">{children}</div>
       </body>
     </html>
-  )
+  );
 }
