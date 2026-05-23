@@ -28,7 +28,9 @@ const mockTable: Table = {
   status: TableStatus.Available,
 };
 
-const mockProduct: Product = {
+// Cast as any because mocks include relations that aren't in the base
+// `Product` model type (productIngredients lives on a related table).
+const mockProduct: Product & { productIngredients: unknown[] } = {
   id: 1,
   name: 'Latte',
   price: new Prisma.Decimal(3.50),
@@ -40,7 +42,7 @@ const mockProduct: Product = {
   productIngredients: [],
 };
 
-const mockOrderItem: OrderItem & { product: Product } = {
+const mockOrderItem: OrderItem & { product: typeof mockProduct } = {
   id: 1,
   orderId: 1,
   productId: 1,

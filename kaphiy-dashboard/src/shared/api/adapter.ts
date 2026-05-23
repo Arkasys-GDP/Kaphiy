@@ -89,6 +89,9 @@ function adaptOrderItem(item: DbOrderItem): OrderItem {
 
 export function adaptOrder(db: DbOrder): Order {
   const dbStatus = (db.kitchen_status ?? "WAITING") as DbKitchenStatus;
+  const paymentRaw = (db.payment_status ?? "PENDING").toUpperCase();
+  const paymentStatus =
+    paymentRaw === "PAID" || paymentRaw === "CANCELLED" ? paymentRaw : "PENDING";
   return {
     id: String(db.id),
     orderNumber: db.payment_code ? `#PED-${db.payment_code}` : `#${db.id}`,
@@ -96,6 +99,8 @@ export function adaptOrder(db: DbOrder): Order {
     tableNumber: db.tables?.table_name ?? String(db.table_id ?? "?"),
     paxCount: 1, // schema has no pax count — default 1 until backend adds it
     status: KITCHEN_STATUS_MAP[dbStatus],
+    paymentStatus,
+    total: db.total ? Number(db.total) : 0,
     items: db.order_items.map(adaptOrderItem),
     createdAt: db.created_at ?? new Date().toISOString(),
     updatedAt: db.created_at ?? new Date().toISOString(),

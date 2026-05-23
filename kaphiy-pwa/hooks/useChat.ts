@@ -24,7 +24,6 @@ export function useChat() {
   const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
-<<<<<<< HEAD
     const generateUUID = (): string => {
       if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
         return crypto.randomUUID();
@@ -43,13 +42,6 @@ export function useChat() {
 
     if (!sid || !uuidRegex.test(sid)) {
       sid = generateUUID();
-=======
-    let sid = localStorage.getItem("chat_session_id");
-    let isNewSession = false;
-    
-    if (!sid) {
-      sid = "session_" + Math.random().toString(36).substring(2, 15);
->>>>>>> claude/distracted-hopper-f93e7d
       localStorage.setItem("chat_session_id", sid);
       isNewSession = true;
     }
@@ -61,13 +53,7 @@ export function useChat() {
     } else {
       const savedMessages = localStorage.getItem("chat_messages");
       if (savedMessages) {
-<<<<<<< HEAD
         try { setMessages(JSON.parse(savedMessages)); } catch (e) {}
-=======
-        try {
-          setMessages(JSON.parse(savedMessages));
-        } catch (e) {}
->>>>>>> claude/distracted-hopper-f93e7d
       }
     }
     setIsInitialized(true);

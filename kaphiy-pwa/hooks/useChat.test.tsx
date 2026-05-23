@@ -17,12 +17,17 @@ describe("useChat (integration with localStorage + webhook)", () => {
     await waitFor(() => expect(result.current.isInitialized).toBe(true));
 
     const sid = localStorage.getItem("chat_session_id");
-    expect(sid).toMatch(/^session_/);
+    // Hook generates RFC 4122 UUID (crypto.randomUUID with fallback).
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    expect(sid).toMatch(uuidRegex);
     expect(result.current.messages).toEqual([]);
   });
 
   it("recovers existing session + messages from localStorage", async () => {
-    localStorage.setItem("chat_session_id", "session_abc123");
+    // Pre-seed with a valid UUID — hook rejects invalid IDs and regenerates.
+    const seededUuid = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+    localStorage.setItem("chat_session_id", seededUuid);
     localStorage.setItem(
       "chat_messages",
       JSON.stringify([
@@ -34,7 +39,7 @@ describe("useChat (integration with localStorage + webhook)", () => {
     const { result } = renderHook(() => useChat());
     await waitFor(() => expect(result.current.isInitialized).toBe(true));
 
-    expect(localStorage.getItem("chat_session_id")).toBe("session_abc123");
+    expect(localStorage.getItem("chat_session_id")).toBe(seededUuid);
     expect(result.current.messages).toHaveLength(1);
     expect(result.current.messages[0].text).toBe("hola");
   });
