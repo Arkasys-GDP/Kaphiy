@@ -7,7 +7,7 @@ import { v2 as cloudinary } from 'cloudinary';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async uploadImage(file: any): Promise<string> {
     cloudinary.config({
@@ -97,7 +97,10 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
     await this.findOne(id);
     const { ingredients, categoryId, ...productData } = updateProductDto;
 
@@ -143,4 +146,3 @@ export class ProductsService {
     });
   }
 }
-

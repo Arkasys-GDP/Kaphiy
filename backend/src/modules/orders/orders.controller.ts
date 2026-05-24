@@ -10,7 +10,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -38,10 +43,7 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get delivered orders today (paginated)' })
-  findHistory(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  findHistory(@Query('page') page?: string, @Query('limit') limit?: string) {
     return this.ordersService.findHistory(
       page ? Number(page) : 1,
       limit ? Number(limit) : 20,

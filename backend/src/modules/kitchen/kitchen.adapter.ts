@@ -87,7 +87,9 @@ export function adaptOrderItem(item: OrderItemWithProduct): OrderItemWire {
 export function adaptOrder(order: OrderWithRelations): OrderWire {
   return {
     id: String(order.id),
-    orderNumber: order.paymentCode ? `#PED-${order.paymentCode}` : `#${order.id}`,
+    orderNumber: order.paymentCode
+      ? `#PED-${order.paymentCode}`
+      : `#${order.id}`,
     tableId: String(order.tableId),
     tableNumber: order.table?.tableName ?? String(order.tableId),
     paxCount: 1, // schema lacks pax count — default 1

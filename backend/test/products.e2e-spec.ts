@@ -30,10 +30,14 @@ describe('Products (integration)', () => {
         findMany: jest.fn().mockResolvedValue([baseProduct]),
         findUnique: jest.fn().mockResolvedValue(baseProduct),
         create: jest.fn().mockResolvedValue({ ...baseProduct, id: 99 }),
-        update: jest.fn().mockResolvedValue({ ...baseProduct, name: 'Latte Vainilla' }),
+        update: jest
+          .fn()
+          .mockResolvedValue({ ...baseProduct, name: 'Latte Vainilla' }),
         delete: jest.fn().mockResolvedValue(baseProduct),
       },
-      productIngredient: { deleteMany: jest.fn().mockResolvedValue({ count: 0 }) },
+      productIngredient: {
+        deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+      },
       barista: {
         findUnique: jest.fn().mockResolvedValue({
           id: 1,
@@ -50,23 +54,35 @@ describe('Products (integration)', () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideProvider(PrismaService).useValue(prismaMock)
-      .overrideProvider(KitchenGateway).useValue({
+      .overrideProvider(PrismaService)
+      .useValue(prismaMock)
+      .overrideProvider(KitchenGateway)
+      .useValue({
         emitNewOrder: jest.fn(),
         emitStatusChanged: jest.fn(),
         emitStats: jest.fn(),
         emitItemAdded: jest.fn(),
         emitSnapshot: jest.fn(),
       })
-      .overrideProvider(KitchenService).useValue({
+      .overrideProvider(KitchenService)
+      .useValue({
         getActiveOrders: jest.fn().mockResolvedValue([]),
-        getStats: jest.fn().mockResolvedValue({ inPrep: 0, alerts: 0, completedToday: 0, avgTimeMinutes: 0 }),
+        getStats: jest.fn().mockResolvedValue({
+          inPrep: 0,
+          alerts: 0,
+          completedToday: 0,
+          avgTimeMinutes: 0,
+        }),
       })
       .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     await app.init();
 
@@ -80,13 +96,17 @@ describe('Products (integration)', () => {
 
   describe('public reads', () => {
     it('GET /products returns 200 with array', async () => {
-      const res = await request(app.getHttpServer()).get('/products').expect(200);
+      const res = await request(app.getHttpServer())
+        .get('/products')
+        .expect(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body[0]).toMatchObject({ id: 1, name: 'Latte' });
     });
 
     it('GET /products/:id returns 200 with product', async () => {
-      const res = await request(app.getHttpServer()).get('/products/1').expect(200);
+      const res = await request(app.getHttpServer())
+        .get('/products/1')
+        .expect(200);
       expect(res.body).toMatchObject({ id: 1, name: 'Latte' });
     });
 
@@ -151,7 +171,9 @@ describe('Products (integration)', () => {
         .delete('/products/1')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
-      expect(prismaMock.product.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(prismaMock.product.delete).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
     });
   });
 

@@ -27,7 +27,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) { }
+  constructor(private readonly productsService: ProductsService) {}
 
   // Reads stay public — n8n agent + customer PWA consume the menu
 
@@ -53,7 +53,10 @@ export class ProductsController {
   @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Upload product image to Cloudinary (admin)' })
-  @ApiResponse({ status: 201, description: 'Return upload response with image URL' })
+  @ApiResponse({
+    status: 201,
+    description: 'Return upload response with image URL',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async uploadImage(@UploadedFile() file: any) {
     if (!file) {

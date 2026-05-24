@@ -17,7 +17,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET') ?? 'kaphiy-dev-secret',
         signOptions: {
-          expiresIn: (config.get<string>('JWT_EXPIRES_IN') ?? '12h') as `${number}h`,
+          expiresIn: (config.get<string>('JWT_EXPIRES_IN') ??
+            '12h') as `${number}h`,
         },
       }),
     }),

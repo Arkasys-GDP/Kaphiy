@@ -1,4 +1,11 @@
-import { Controller, NotFoundException, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { KitchenStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -23,7 +30,8 @@ export class OrderItemsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Mark an order_item product as unavailable + flip parent order to OUT_OF_STOCK',
+    summary:
+      'Mark an order_item product as unavailable + flip parent order to OUT_OF_STOCK',
   })
   async markOutOfStock(@Param('id', ParseIntPipe) id: number) {
     const item = await this.prisma.orderItem.findUnique({
@@ -31,7 +39,8 @@ export class OrderItemsController {
       include: { product: true, order: true },
     });
     if (!item) throw new NotFoundException(`OrderItem ${id} not found`);
-    if (!item.product) throw new NotFoundException('Product missing on order_item');
+    if (!item.product)
+      throw new NotFoundException('Product missing on order_item');
 
     // Mark product unavailable globally (cascades to client-facing PWA)
     await this.prisma.product.update({
@@ -41,7 +50,10 @@ export class OrderItemsController {
 
     // Flip parent order to OUT_OF_STOCK if it's still in active state
     let parentStatus = item.order.kitchenStatus;
-    if (ACTIVE_KITCHEN_STATUSES.includes(parentStatus) && parentStatus !== KitchenStatus.OUT_OF_STOCK) {
+    if (
+      ACTIVE_KITCHEN_STATUSES.includes(parentStatus) &&
+      parentStatus !== KitchenStatus.OUT_OF_STOCK
+    ) {
       const updated = await this.prisma.order.update({
         where: { id: item.orderId },
         data: { kitchenStatus: KitchenStatus.OUT_OF_STOCK },
@@ -50,7 +62,10 @@ export class OrderItemsController {
     }
 
     // Broadcast: parent status change + stats refresh
-    this.gateway.emitStatusChanged(String(item.orderId), toWireStatus(parentStatus));
+    this.gateway.emitStatusChanged(
+      String(item.orderId),
+      toWireStatus(parentStatus),
+    );
     void this.kitchen.getStats().then((s) => this.gateway.emitStats(s));
 
     return {

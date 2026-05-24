@@ -72,10 +72,19 @@ describe('Orders (integration)', () => {
         findUnique: jest.fn().mockResolvedValue(mkOrder()),
         findMany: jest.fn().mockResolvedValue([mkOrder()]),
         create: jest.fn().mockImplementation(({ data }) =>
-          Promise.resolve(mkOrder({ tableId: data.table?.connect?.id ?? data.tableId, total: new Prisma.Decimal(String(data.total)) })),
+          Promise.resolve(
+            mkOrder({
+              tableId: data.table?.connect?.id ?? data.tableId,
+              total: new Prisma.Decimal(String(data.total)),
+            }),
+          ),
         ),
         update: jest.fn().mockImplementation(({ data }) =>
-          Promise.resolve(mkOrder({ kitchenStatus: data.kitchenStatus ?? KitchenStatus.PREPARING })),
+          Promise.resolve(
+            mkOrder({
+              kitchenStatus: data.kitchenStatus ?? KitchenStatus.PREPARING,
+            }),
+          ),
         ),
         delete: jest.fn().mockResolvedValue(mkOrder()),
         count: jest.fn().mockResolvedValue(0),
@@ -85,7 +94,11 @@ describe('Orders (integration)', () => {
       },
       barista: {
         findUnique: jest.fn().mockResolvedValue({
-          id: 1, name: 'Tester', pinHash: 'x', isActive: true, createdAt: new Date(),
+          id: 1,
+          name: 'Tester',
+          pinHash: 'x',
+          isActive: true,
+          createdAt: new Date(),
         }),
         findMany: jest.fn(),
       },
@@ -94,10 +107,19 @@ describe('Orders (integration)', () => {
 
     kitchenServiceMock = {
       getActiveOrders: jest.fn().mockResolvedValue([
-        { id: '41', orderNumber: '#PED-0041', tableNumber: '3', status: 'PENDING', items: [] },
+        {
+          id: '41',
+          orderNumber: '#PED-0041',
+          tableNumber: '3',
+          status: 'PENDING',
+          items: [],
+        },
       ]),
       getStats: jest.fn().mockResolvedValue({
-        inPrep: 1, alerts: 0, completedToday: 5, avgTimeMinutes: 7.2,
+        inPrep: 1,
+        alerts: 0,
+        completedToday: 5,
+        avgTimeMinutes: 7.2,
       }),
     };
 
@@ -112,14 +134,21 @@ describe('Orders (integration)', () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideProvider(PrismaService).useValue(prismaMock)
-      .overrideProvider(KitchenGateway).useValue(kitchenGatewayMock)
-      .overrideProvider(KitchenService).useValue(kitchenServiceMock)
+      .overrideProvider(PrismaService)
+      .useValue(prismaMock)
+      .overrideProvider(KitchenGateway)
+      .useValue(kitchenGatewayMock)
+      .overrideProvider(KitchenService)
+      .useValue(kitchenServiceMock)
       .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     await app.init();
 
@@ -211,7 +240,9 @@ describe('Orders (integration)', () => {
     });
 
     it('GET /orders/:id returns 200', async () => {
-      const res = await request(app.getHttpServer()).get('/orders/41').expect(200);
+      const res = await request(app.getHttpServer())
+        .get('/orders/41')
+        .expect(200);
       expect(res.body).toMatchObject({ id: 41 });
     });
 
@@ -279,7 +310,9 @@ describe('Orders (integration)', () => {
     });
 
     it('GET /orders/history with token returns 200 with pagination shape', async () => {
-      prismaMock.order.findMany.mockResolvedValueOnce([mkOrder({ kitchenStatus: KitchenStatus.DELIVERED })]);
+      prismaMock.order.findMany.mockResolvedValueOnce([
+        mkOrder({ kitchenStatus: KitchenStatus.DELIVERED }),
+      ]);
       prismaMock.order.count.mockResolvedValueOnce(1);
 
       const res = await request(app.getHttpServer())

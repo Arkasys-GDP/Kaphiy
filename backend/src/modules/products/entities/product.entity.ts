@@ -1,10 +1,10 @@
-import { Category } from "src/modules/categories/entities/category.entity";
-import { Ingredient } from "src/modules/ingredients/entities/ingredient.entity";
+import { Category } from 'src/modules/categories/entities/category.entity';
+import { Ingredient } from 'src/modules/ingredients/entities/ingredient.entity';
 
 export class ProductIngredient {
-    product: Product;
-    ingredient: Ingredient;
-    isOptional: boolean;
+  product: Product;
+  ingredient: Ingredient;
+  isOptional: boolean;
 }
 
 export class Product {

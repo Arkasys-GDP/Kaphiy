@@ -45,10 +45,19 @@ export interface OrderStatsWire {
 
 // Server → Client
 export interface ServerToClientEvents {
-  'orders:snapshot': (payload: { orders: OrderWire[]; stats: OrderStatsWire }) => void;
+  'orders:snapshot': (payload: {
+    orders: OrderWire[];
+    stats: OrderStatsWire;
+  }) => void;
   'orders:new': (order: OrderWire) => void;
-  'orders:item-added': (payload: { orderId: string; items: OrderItemWire[] }) => void;
-  'orders:status-changed': (payload: { orderId: string; status: KitchenStatusWire }) => void;
+  'orders:item-added': (payload: {
+    orderId: string;
+    items: OrderItemWire[];
+  }) => void;
+  'orders:status-changed': (payload: {
+    orderId: string;
+    status: KitchenStatusWire;
+  }) => void;
   'orders:stats': (stats: OrderStatsWire) => void;
 }
 
@@ -63,12 +72,24 @@ export interface ClientToServerEvents {
     payload: null,
     ack: (snapshot: { orders: OrderWire[]; stats: OrderStatsWire }) => void,
   ) => void;
-  'order:start': (payload: { orderId: string }, ack: (res: AckResponse) => void) => void;
-  'order:ready': (payload: { orderId: string }, ack: (res: AckResponse) => void) => void;
-  'order:deliver': (payload: { orderId: string }, ack: (res: AckResponse) => void) => void;
+  'order:start': (
+    payload: { orderId: string },
+    ack: (res: AckResponse) => void,
+  ) => void;
+  'order:ready': (
+    payload: { orderId: string },
+    ack: (res: AckResponse) => void,
+  ) => void;
+  'order:deliver': (
+    payload: { orderId: string },
+    ack: (res: AckResponse) => void,
+  ) => void;
   'order:out-of-stock': (
     payload: { orderId: string; itemId: string },
     ack: (res: AckResponse) => void,
   ) => void;
-  'order:print': (payload: { orderId: string }, ack: (res: AckResponse) => void) => void;
+  'order:print': (
+    payload: { orderId: string },
+    ack: (res: AckResponse) => void,
+  ) => void;
 }

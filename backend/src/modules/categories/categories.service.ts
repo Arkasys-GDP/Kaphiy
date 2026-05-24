@@ -30,7 +30,10 @@ export class CategoriesService {
     return category;
   }
 
-  async update(id: number, updateCategoryDto: UpdateCategoryDto): Promise<Category> {
+  async update(
+    id: number,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
     await this.findOne(id);
     return this.prisma.category.update({
       where: { id },
@@ -45,4 +48,3 @@ export class CategoriesService {
     });
   }
 }
-

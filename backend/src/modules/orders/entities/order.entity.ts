@@ -1,14 +1,14 @@
-import { PaymentStatus, KitchenStatus } from "@prisma/client";
-import { Product } from "src/modules/products/entities/product.entity";
-import { Table } from "src/modules/tables/entities/table.entity";
+import { PaymentStatus, KitchenStatus } from '@prisma/client';
+import { Product } from 'src/modules/products/entities/product.entity';
+import { Table } from 'src/modules/tables/entities/table.entity';
 
 export class OrderItem {
-    id: number;
-    order: Order;
-    product: Product;
-    quantity: number;
-    unitPrice: number;
-    aiNotes: string | null;
+  id: number;
+  order: Order;
+  product: Product;
+  quantity: number;
+  unitPrice: number;
+  aiNotes: string | null;
 }
 
 export class Order {

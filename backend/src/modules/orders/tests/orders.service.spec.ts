@@ -4,7 +4,16 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { KitchenGateway } from '../../kitchen/kitchen.gateway';
 import { KitchenService } from '../../kitchen/kitchen.service';
 import { NotFoundException } from '@nestjs/common';
-import { Order, Product, Table, OrderItem, PaymentStatus, KitchenStatus, TableStatus, Prisma } from '@prisma/client';
+import {
+  Order,
+  Product,
+  Table,
+  OrderItem,
+  PaymentStatus,
+  KitchenStatus,
+  TableStatus,
+  Prisma,
+} from '@prisma/client';
 
 const mockPrismaService = {
   order: {
@@ -19,7 +28,7 @@ const mockPrismaService = {
   },
   orderItem: {
     deleteMany: jest.fn(),
-  }
+  },
 };
 
 const mockTable: Table = {
@@ -33,7 +42,7 @@ const mockTable: Table = {
 const mockProduct: Product & { productIngredients: unknown[] } = {
   id: 1,
   name: 'Latte',
-  price: new Prisma.Decimal(3.50),
+  price: new Prisma.Decimal(3.5),
   isAvailable: true,
   categoryId: 1,
   aiDescription: null,
@@ -47,7 +56,7 @@ const mockOrderItem: OrderItem & { product: typeof mockProduct } = {
   orderId: 1,
   productId: 1,
   quantity: 2,
-  unitPrice: new Prisma.Decimal(3.50),
+  unitPrice: new Prisma.Decimal(3.5),
   aiNotes: null,
   product: { ...mockProduct, productIngredients: [] },
 };
@@ -57,7 +66,7 @@ const mockOrder: any = {
   tableId: 1,
   chatSessionId: null,
   paymentCode: '123456',
-  total: new Prisma.Decimal(7.00),
+  total: new Prisma.Decimal(7.0),
   paymentStatus: PaymentStatus.PENDING,
   kitchenStatus: KitchenStatus.WAITING,
   createdAt: new Date(),
@@ -93,7 +102,10 @@ describe('OrdersService', () => {
           useValue: {
             getActiveOrders: jest.fn().mockResolvedValue([]),
             getStats: jest.fn().mockResolvedValue({
-              inPrep: 0, alerts: 0, completedToday: 0, avgTimeMinutes: 0,
+              inPrep: 0,
+              alerts: 0,
+              completedToday: 0,
+              avgTimeMinutes: 0,
             }),
           },
         },
@@ -113,17 +125,19 @@ describe('OrdersService', () => {
       mockPrismaService.order.create.mockResolvedValue(mockOrder);
       const result = await service.create({
         tableId: 1,
-        items: [{ productId: 1, quantity: 2 }]
+        items: [{ productId: 1, quantity: 2 }],
       });
       expect(result).toEqual(mockOrder);
     });
 
     it('should throw NotFoundException if a product is not found', async () => {
       mockPrismaService.product.findMany.mockResolvedValue([]);
-      await expect(service.create({
-        tableId: 1,
-        items: [{ productId: 1, quantity: 2 }]
-      })).rejects.toThrow(NotFoundException);
+      await expect(
+        service.create({
+          tableId: 1,
+          items: [{ productId: 1, quantity: 2 }],
+        }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -153,13 +167,17 @@ describe('OrdersService', () => {
       mockPrismaService.order.findUnique.mockResolvedValue(mockOrder);
       mockPrismaService.product.findMany.mockResolvedValue([mockProduct]);
       mockPrismaService.order.update.mockResolvedValue(mockOrder);
-      const result = await service.update(1, { kitchenStatus: KitchenStatus.PREPARING });
+      const result = await service.update(1, {
+        kitchenStatus: KitchenStatus.PREPARING,
+      });
       expect(result).toEqual(mockOrder);
     });
 
     it('should throw a NotFoundException if order to update is not found', async () => {
       mockPrismaService.order.findUnique.mockResolvedValue(null);
-      await expect(service.update(1, { kitchenStatus: KitchenStatus.PREPARING })).rejects.toThrow(NotFoundException);
+      await expect(
+        service.update(1, { kitchenStatus: KitchenStatus.PREPARING }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

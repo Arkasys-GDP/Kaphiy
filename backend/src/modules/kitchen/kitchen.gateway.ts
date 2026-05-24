@@ -93,17 +93,23 @@ export class KitchenGateway
   }
 
   @SubscribeMessage('order:start')
-  async handleStart(@MessageBody() payload: { orderId: string }): Promise<AckResponse> {
+  async handleStart(
+    @MessageBody() payload: { orderId: string },
+  ): Promise<AckResponse> {
     return this.transitionStatus(payload.orderId, KitchenStatus.PREPARING);
   }
 
   @SubscribeMessage('order:ready')
-  async handleReady(@MessageBody() payload: { orderId: string }): Promise<AckResponse> {
+  async handleReady(
+    @MessageBody() payload: { orderId: string },
+  ): Promise<AckResponse> {
     return this.transitionStatus(payload.orderId, KitchenStatus.READY);
   }
 
   @SubscribeMessage('order:deliver')
-  async handleDeliver(@MessageBody() payload: { orderId: string }): Promise<AckResponse> {
+  async handleDeliver(
+    @MessageBody() payload: { orderId: string },
+  ): Promise<AckResponse> {
     return this.transitionStatus(payload.orderId, KitchenStatus.DELIVERED);
   }
 
@@ -117,7 +123,8 @@ export class KitchenGateway
         where: { id: itemId },
         include: { product: true, order: true },
       });
-      if (!item || !item.product) throw new NotFoundException('OrderItem not found');
+      if (!item || !item.product)
+        throw new NotFoundException('OrderItem not found');
 
       await this.prisma.product.update({
         where: { id: item.product.id },
@@ -155,7 +162,10 @@ export class KitchenGateway
       const order = await this.prisma.order.findUnique({ where: { id } });
       if (!order) throw new NotFoundException(`Order ${id} not found`);
 
-      if (next === KitchenStatus.DELIVERED && order.paymentStatus !== PaymentStatus.PAID) {
+      if (
+        next === KitchenStatus.DELIVERED &&
+        order.paymentStatus !== PaymentStatus.PAID
+      ) {
         throw new Error('La orden debe estar pagada antes de ser entregada');
       }
 
@@ -164,7 +174,10 @@ export class KitchenGateway
         data: { kitchenStatus: next },
       });
 
-      this.emitStatusChanged(String(updated.id), toWireStatus(updated.kitchenStatus));
+      this.emitStatusChanged(
+        String(updated.id),
+        toWireStatus(updated.kitchenStatus),
+      );
       void this.kitchen.getStats().then((s) => this.emitStats(s));
       return { ok: true };
     } catch (err) {

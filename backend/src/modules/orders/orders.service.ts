@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -56,7 +60,7 @@ export class OrdersService {
     private readonly prisma: PrismaService,
     private readonly gateway: KitchenGateway,
     private readonly kitchen: KitchenService,
-  ) { }
+  ) {}
 
   // ── Public endpoints ──────────────────────────────────────
 
@@ -196,7 +200,10 @@ export class OrdersService {
     };
   }
 
-  private rangeWindow(range: MetricsRange): { since: Date; bucket: 'hour' | 'day' } {
+  private rangeWindow(range: MetricsRange): {
+    since: Date;
+    bucket: 'hour' | 'day';
+  } {
     const now = new Date();
     if (range === 'daily') {
       const since = new Date(now.getTime() - 24 * 60 * 60_000);
@@ -215,8 +222,13 @@ export class OrdersService {
     const existing = await this.prisma.order.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException(`Order ${id} not found`);
 
-    if (kitchenStatus === KitchenStatus.DELIVERED && existing.paymentStatus !== PaymentStatus.PAID) {
-      throw new BadRequestException('La orden debe estar pagada antes de ser entregada');
+    if (
+      kitchenStatus === KitchenStatus.DELIVERED &&
+      existing.paymentStatus !== PaymentStatus.PAID
+    ) {
+      throw new BadRequestException(
+        'La orden debe estar pagada antes de ser entregada',
+      );
     }
 
     const updated = await this.prisma.order.update({
@@ -226,7 +238,10 @@ export class OrdersService {
     });
 
     // Broadcast status change + refreshed stats
-    this.gateway.emitStatusChanged(String(updated.id), toWireStatus(updated.kitchenStatus));
+    this.gateway.emitStatusChanged(
+      String(updated.id),
+      toWireStatus(updated.kitchenStatus),
+    );
     void this.kitchen.getStats().then((s) => this.gateway.emitStats(s));
 
     return adaptOrder(updated);
@@ -248,7 +263,7 @@ export class OrdersService {
     // if there is one. The adapter `toWireStatus` maps kitchen status.
     // Let's emit a generic update or just update the DB. For now, just return it.
     // If the frontend needs real-time payment updates, we would emit it.
-    // Let's at least emit a full order update if such event exists, 
+    // Let's at least emit a full order update if such event exists,
     // or we can emit the new order so it overrides.
     this.gateway.emitNewOrder(adaptOrder(updated));
     void this.kitchen.getStats().then((s) => this.gateway.emitStats(s));
@@ -269,7 +284,7 @@ export class OrdersService {
     }
 
     const total = items.reduce((acc, item) => {
-      const product = products.find((p) => p.id === item.productId)!;
+      const product = products.find((p) => p.id === item.productId);
       return acc + product.price.toNumber() * item.quantity;
     }, 0);
 
@@ -280,7 +295,7 @@ export class OrdersService {
         table: tableId ? { connect: { id: tableId } } : undefined,
         orderItems: {
           create: items.map((item) => {
-            const product = products.find((p) => p.id === item.productId)!;
+            const product = products.find((p) => p.id === item.productId);
             return {
               quantity: item.quantity,
               unitPrice: product.price,
@@ -322,7 +337,9 @@ export class OrdersService {
     const { items, tableId, ...orderData } = dto;
 
     let total: number | undefined;
-    let products: Array<Awaited<ReturnType<PrismaService['product']['findMany']>>[number]> = [];
+    let products: Array<
+      Awaited<ReturnType<PrismaService['product']['findMany']>>[number]
+    > = [];
 
     if (items) {
       products = await this.prisma.product.findMany({
@@ -332,7 +349,7 @@ export class OrdersService {
         throw new NotFoundException('One or more products not found');
       }
       total = items.reduce((acc, item) => {
-        const product = products.find((p) => p.id === item.productId)!;
+        const product = products.find((p) => p.id === item.productId);
         return acc + product.price.toNumber() * item.quantity;
       }, 0);
       await this.prisma.orderItem.deleteMany({ where: { orderId: id } });
@@ -346,16 +363,16 @@ export class OrdersService {
         table: tableId ? { connect: { id: tableId } } : undefined,
         orderItems: items
           ? {
-            create: items.map((item) => {
-              const product = products.find((p) => p.id === item.productId)!;
-              return {
-                quantity: item.quantity,
-                unitPrice: product.price,
-                aiNotes: item.aiNotes,
-                product: { connect: { id: item.productId } },
-              };
-            }),
-          }
+              create: items.map((item) => {
+                const product = products.find((p) => p.id === item.productId);
+                return {
+                  quantity: item.quantity,
+                  unitPrice: product.price,
+                  aiNotes: item.aiNotes,
+                  product: { connect: { id: item.productId } },
+                };
+              }),
+            }
           : undefined,
       },
       include: { orderItems: { include: { product: true } }, table: true },

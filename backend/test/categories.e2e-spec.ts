@@ -18,7 +18,9 @@ describe('Categories (integration)', () => {
   beforeEach(async () => {
     prismaMock = {
       category: {
-        findMany: jest.fn().mockResolvedValue([cat(1, 'Cafés'), cat(2, 'Panadería')]),
+        findMany: jest
+          .fn()
+          .mockResolvedValue([cat(1, 'Cafés'), cat(2, 'Panadería')]),
         findUnique: jest.fn().mockResolvedValue(cat(1, 'Cafés')),
         create: jest.fn().mockResolvedValue(cat(3, 'Bebidas')),
         update: jest.fn().mockResolvedValue(cat(1, 'Cafés Especiales')),
@@ -26,7 +28,11 @@ describe('Categories (integration)', () => {
       },
       barista: {
         findUnique: jest.fn().mockResolvedValue({
-          id: 1, name: 'Tester', pinHash: 'x', isActive: true, createdAt: new Date(),
+          id: 1,
+          name: 'Tester',
+          pinHash: 'x',
+          isActive: true,
+          createdAt: new Date(),
         }),
         findMany: jest.fn(),
       },
@@ -36,23 +42,35 @@ describe('Categories (integration)', () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideProvider(PrismaService).useValue(prismaMock)
-      .overrideProvider(KitchenGateway).useValue({
+      .overrideProvider(PrismaService)
+      .useValue(prismaMock)
+      .overrideProvider(KitchenGateway)
+      .useValue({
         emitNewOrder: jest.fn(),
         emitStatusChanged: jest.fn(),
         emitStats: jest.fn(),
         emitItemAdded: jest.fn(),
         emitSnapshot: jest.fn(),
       })
-      .overrideProvider(KitchenService).useValue({
+      .overrideProvider(KitchenService)
+      .useValue({
         getActiveOrders: jest.fn().mockResolvedValue([]),
-        getStats: jest.fn().mockResolvedValue({ inPrep: 0, alerts: 0, completedToday: 0, avgTimeMinutes: 0 }),
+        getStats: jest.fn().mockResolvedValue({
+          inPrep: 0,
+          alerts: 0,
+          completedToday: 0,
+          avgTimeMinutes: 0,
+        }),
       })
       .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     await app.init();
 
@@ -65,13 +83,17 @@ describe('Categories (integration)', () => {
   });
 
   it('GET /categories returns 200 with list', async () => {
-    const res = await request(app.getHttpServer()).get('/categories').expect(200);
+    const res = await request(app.getHttpServer())
+      .get('/categories')
+      .expect(200);
     expect(res.body).toHaveLength(2);
     expect(res.body[0]).toMatchObject({ id: 1, name: 'Cafés' });
   });
 
   it('GET /categories/:id returns 200 with the category', async () => {
-    const res = await request(app.getHttpServer()).get('/categories/1').expect(200);
+    const res = await request(app.getHttpServer())
+      .get('/categories/1')
+      .expect(200);
     expect(res.body).toMatchObject({ id: 1, name: 'Cafés' });
   });
 
@@ -114,6 +136,8 @@ describe('Categories (integration)', () => {
       .delete('/categories/1')
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
-    expect(prismaMock.category.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+    expect(prismaMock.category.delete).toHaveBeenCalledWith({
+      where: { id: 1 },
+    });
   });
 });

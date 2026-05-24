@@ -22,7 +22,13 @@ describe('Auth (integration)', () => {
     prismaMock = {
       barista: {
         findMany: jest.fn().mockResolvedValue([
-          { id: 1, name: 'Sebas', pinHash: validPinHash, isActive: true, createdAt: new Date() },
+          {
+            id: 1,
+            name: 'Sebas',
+            pinHash: validPinHash,
+            isActive: true,
+            createdAt: new Date(),
+          },
         ]),
         findUnique: jest.fn().mockResolvedValue({
           id: 1,
@@ -41,23 +47,35 @@ describe('Auth (integration)', () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideProvider(PrismaService).useValue(prismaMock)
-      .overrideProvider(KitchenGateway).useValue({
+      .overrideProvider(PrismaService)
+      .useValue(prismaMock)
+      .overrideProvider(KitchenGateway)
+      .useValue({
         emitNewOrder: jest.fn(),
         emitStatusChanged: jest.fn(),
         emitStats: jest.fn(),
         emitItemAdded: jest.fn(),
         emitSnapshot: jest.fn(),
       })
-      .overrideProvider(KitchenService).useValue({
+      .overrideProvider(KitchenService)
+      .useValue({
         getActiveOrders: jest.fn().mockResolvedValue([]),
-        getStats: jest.fn().mockResolvedValue({ inPrep: 0, alerts: 0, completedToday: 0, avgTimeMinutes: 0 }),
+        getStats: jest.fn().mockResolvedValue({
+          inPrep: 0,
+          alerts: 0,
+          completedToday: 0,
+          avgTimeMinutes: 0,
+        }),
       })
       .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     await app.init();
   });
