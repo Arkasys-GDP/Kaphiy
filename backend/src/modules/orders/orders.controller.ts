@@ -15,6 +15,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
+import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { MetricsQueryDto } from './dto/metrics-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -64,6 +65,17 @@ export class OrdersController {
     @Body() dto: UpdateStatusDto,
   ) {
     return this.ordersService.updateStatus(id, dto.kitchenStatus);
+  }
+
+  @Patch(':id/payment')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update payment_status' })
+  updatePayment(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdatePaymentDto,
+  ) {
+    return this.ordersService.updatePaymentStatus(id, dto.paymentStatus);
   }
 
   // ── Existing CRUD ────────────────────────────────────────

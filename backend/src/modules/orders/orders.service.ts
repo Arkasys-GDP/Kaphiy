@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { KitchenStatus, Order, Prisma } from '@prisma/client';
+import { KitchenStatus, Order, Prisma, PaymentStatus } from '@prisma/client';
 import { KitchenGateway } from '../kitchen/kitchen.gateway';
 import { KitchenService } from '../kitchen/kitchen.service';
 import {
@@ -215,6 +215,10 @@ export class OrdersService {
     const existing = await this.prisma.order.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException(`Order ${id} not found`);
 
+    if (kitchenStatus === KitchenStatus.DELIVERED && existing.paymentStatus !== PaymentStatus.PAID) {
+      throw new BadRequestException('La orden debe estar pagada antes de ser entregada');
+    }
+
     const updated = await this.prisma.order.update({
       where: { id },
       data: { kitchenStatus },
@@ -223,6 +227,30 @@ export class OrdersService {
 
     // Broadcast status change + refreshed stats
     this.gateway.emitStatusChanged(String(updated.id), toWireStatus(updated.kitchenStatus));
+    void this.kitchen.getStats().then((s) => this.gateway.emitStats(s));
+
+    return adaptOrder(updated);
+  }
+
+  async updatePaymentStatus(id: number, paymentStatus: PaymentStatus) {
+    const existing = await this.prisma.order.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Order ${id} not found`);
+
+    const updated = await this.prisma.order.update({
+      where: { id },
+      data: { paymentStatus },
+      include: ORDER_INCLUDE,
+    });
+
+    // We can emit a specific payment event or emit the full order update
+    // using the existing gateway if needed, but since the frontend expects full order
+    // when receiving a new order, or maybe just stats. We'll emit an order update event
+    // if there is one. The adapter `toWireStatus` maps kitchen status.
+    // Let's emit a generic update or just update the DB. For now, just return it.
+    // If the frontend needs real-time payment updates, we would emit it.
+    // Let's at least emit a full order update if such event exists, 
+    // or we can emit the new order so it overrides.
+    this.gateway.emitNewOrder(adaptOrder(updated));
     void this.kitchen.getStats().then((s) => this.gateway.emitStats(s));
 
     return adaptOrder(updated);

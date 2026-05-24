@@ -3,8 +3,9 @@
 import { useKaphiyStore } from "../store"
 import { OrderCard } from "./OrderCard"
 import { useOrderRemoteActions } from "../hooks/useOrdersSocket"
+import { usePayOrder } from "../hooks/useActiveOrders"
 import { InboxIcon } from "lucide-react"
-import { useMemo } from "react"
+import { useMemo, useCallback } from "react"
 
 export function OrderGrid() {
   const allOrders = useKaphiyStore((s) => s.orders)
@@ -21,6 +22,19 @@ export function OrderGrid() {
 
   const { startOrder, markReady, markDelivered, markOutOfStock } =
     useOrderRemoteActions()
+
+  const { mutateAsync: payOrder } = usePayOrder()
+  const handlePay = useCallback(
+    async (id: string) => {
+      try {
+        await payOrder(id)
+        return true
+      } catch {
+        return false
+      }
+    },
+    [payOrder]
+  )
 
   return (
     <main
@@ -83,6 +97,7 @@ export function OrderGrid() {
               onReady={markReady}
               onDeliver={markDelivered}
               onOutOfStock={markOutOfStock}
+              onPay={handlePay}
             />
           ))
         )}

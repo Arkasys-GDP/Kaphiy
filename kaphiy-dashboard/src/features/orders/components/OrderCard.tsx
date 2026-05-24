@@ -23,6 +23,7 @@ interface Props {
   onReady: (id: string) => Promise<boolean>;
   onDeliver: (id: string) => Promise<boolean>;
   onOutOfStock: (orderId: string, itemId: string) => Promise<boolean>;
+  onPay: (id: string) => Promise<boolean>;
 }
 
 export function OrderCard({
@@ -31,6 +32,7 @@ export function OrderCard({
   onReady,
   onDeliver,
   onOutOfStock,
+  onPay,
 }: Props) {
   const warnSecs = useKaphiyStore((s) => s.semaphoreWarnSecs);
   const alertSecs = useKaphiyStore((s) => s.semaphoreAlertSecs);
@@ -160,6 +162,21 @@ export function OrderCard({
 
       {/* Footer actions */}
       <footer className="flex gap-2 px-6 py-4">
+        {order.paymentStatus !== "PAID" && (
+          <button
+            onClick={() => onPay(order.id)}
+            aria-label="Marcar Pagado"
+            className={cn(
+              "flex flex-1 cursor-pointer items-center justify-center gap-2.5 rounded-[18px] px-4 py-4 text-sm font-bold transition-all",
+              "border border-[var(--sem-ok)] bg-[color-mix(in_oklch,var(--sem-ok)_10%,transparent)] text-[var(--sem-ok)] hover:bg-[var(--sem-ok)] hover:text-white",
+              "active:translate-y-0.5",
+              "focus-visible:outline-2 focus-visible:outline-[var(--sem-ok)]",
+            )}
+          >
+            <BadgeCheck className="size-4.5" aria-hidden />
+            Marcar Pagado
+          </button>
+        )}
         {actionLabel && (
           <button
             onClick={handleAction}

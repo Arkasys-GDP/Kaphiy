@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetcher } from "@/src/shared/api/fetcher";
 import { useKaphiyStore } from "../store";
 import { useAuthStore } from "@/src/features/auth/store/authSlice";
@@ -33,4 +33,16 @@ export function useActiveOrders() {
   }, [query.data, setOrders, setStats]);
 
   return query;
+}
+
+export function usePayOrder() {
+  const token = useAuthStore((s) => s.token);
+  return useMutation({
+    mutationFn: (orderId: string) =>
+      fetcher(`/orders/${orderId}/payment`, {
+        method: "PATCH",
+        token: token!,
+        body: JSON.stringify({ paymentStatus: "PAID" }),
+      }),
+  });
 }

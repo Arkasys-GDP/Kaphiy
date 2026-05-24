@@ -21,9 +21,15 @@ export const createOrdersSlice: StateCreator<KaphiyStore, [], [], OrdersSlice> =
   setOrders: (orders) => set({ orders }),
 
   addOrder: (order) =>
-    set((state) => ({
-      orders: [order, ...state.orders],
-    })),
+    set((state) => {
+      const exists = state.orders.some((o) => o.id === order.id);
+      if (exists) {
+        return {
+          orders: state.orders.map((o) => (o.id === order.id ? order : o)),
+        };
+      }
+      return { orders: [order, ...state.orders] };
+    }),
 
   updateOrderStatus: (orderId, status) =>
     set((state) => ({

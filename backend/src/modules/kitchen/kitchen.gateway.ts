@@ -10,7 +10,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { KitchenStatus } from '@prisma/client';
+import { KitchenStatus, PaymentStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { KitchenService } from './kitchen.service';
 import { ACTIVE_KITCHEN_STATUSES, toWireStatus } from './kitchen.adapter';
@@ -154,6 +154,10 @@ export class KitchenGateway
       const id = Number(orderIdRaw);
       const order = await this.prisma.order.findUnique({ where: { id } });
       if (!order) throw new NotFoundException(`Order ${id} not found`);
+
+      if (next === KitchenStatus.DELIVERED && order.paymentStatus !== PaymentStatus.PAID) {
+        throw new Error('La orden debe estar pagada antes de ser entregada');
+      }
 
       const updated = await this.prisma.order.update({
         where: { id },
