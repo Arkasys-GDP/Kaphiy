@@ -3,8 +3,8 @@ import Link from "next/link";
 
 function normalizeText(text: string): string {
   return text
-    .replace(/\\n/g, "\n")   
-    .replace(/\n{3,}/g, "\n\n"); 
+    .replace(/\\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n");
 }
 
 function parseBold(text: string) {
@@ -95,4 +95,3 @@ export function UserBubble({ message }: { message: Message }) {
     </div>
   );
 }
-

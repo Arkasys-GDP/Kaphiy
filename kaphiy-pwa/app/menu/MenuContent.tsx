@@ -55,10 +55,10 @@ export function MenuContent() {
 
   const filtered = search.trim()
     ? products.filter(
-        (p) =>
-          p.name.toLowerCase().includes(search.toLowerCase()) ||
-          p.description.toLowerCase().includes(search.toLowerCase())
-      )
+      (p) =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.description.toLowerCase().includes(search.toLowerCase())
+    )
     : null;
 
   const productsToGroup = activeCategory && !search.trim()
@@ -201,12 +201,12 @@ export function MenuContent() {
             const isCollapsed = collapsedCategories[categoryLabel] || false;
             return (
               <div key={categoryLabel} style={{ marginBottom: "1.5rem" }}>
-                <div 
+                <div
                   onClick={() => toggleCategory(categoryLabel)}
-                  style={{ 
-                    display: "flex", 
-                    alignItems: "center", 
-                    gap: "0.5rem", 
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
                     marginBottom: "0.75rem",
                     cursor: "pointer",
                     userSelect: "none"

@@ -57,16 +57,16 @@ function QRPlaceholder() {
 
 // ── Mapas de estado ────────────────────────────────────────────────────────────
 const KITCHEN_LABELS: Record<string, { label: string; emoji: string; color: string; bg: string }> = {
-  WAITING:    { label: "En cola · Recibido",    emoji: "⏳", color: "#92714a", bg: "#f5ece3" },
-  PREPARING:  { label: "En preparación",        emoji: "👨‍🍳", color: "#b45309", bg: "#fef3c7" },
-  READY:      { label: "Listo para retirar",    emoji: "☕", color: "#15803d", bg: "#dcfce7" },
-  DELIVERED:  { label: "Entregado",             emoji: "✅", color: "#166534", bg: "#bbf7d0" },
-  OUT_OF_STOCK: { label: "Sin stock",           emoji: "❌", color: "#991b1b", bg: "#fee2e2" },
+  WAITING: { label: "En cola · Recibido", emoji: "⏳", color: "#92714a", bg: "#f5ece3" },
+  PREPARING: { label: "En preparación", emoji: "👨‍🍳", color: "#b45309", bg: "#fef3c7" },
+  READY: { label: "Listo para retirar", emoji: "☕", color: "#15803d", bg: "#dcfce7" },
+  DELIVERED: { label: "Entregado", emoji: "✅", color: "#166534", bg: "#bbf7d0" },
+  OUT_OF_STOCK: { label: "Sin stock", emoji: "❌", color: "#991b1b", bg: "#fee2e2" },
 };
 const PAYMENT_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  PENDING:  { label: "No pagado",  color: "#b91c1c", bg: "#fee2e2" },
-  PAID:     { label: "Pagado",     color: "#15803d", bg: "#dcfce7" },
-  CANCELLED:{ label: "Cancelado", color: "#6b7280", bg: "#f3f4f6" },
+  PENDING: { label: "No pagado", color: "#b91c1c", bg: "#fee2e2" },
+  PAID: { label: "Pagado", color: "#15803d", bg: "#dcfce7" },
+  CANCELLED: { label: "Cancelado", color: "#6b7280", bg: "#f3f4f6" },
 };
 
 function StatusBadge({ label, emoji, color, bg }: { label: string; emoji: string; color: string; bg: string }) {
@@ -86,7 +86,7 @@ function ConfirmationScreen({
 }: { total: number; orderId: number | null; onBack: () => void }) {
   const [kitchenStatus, setKitchenStatus] = useState<string>("WAITING");
   const [paymentStatus, setPaymentStatus] = useState<string>("PENDING");
-  const [pollError, setPollError]         = useState(false);
+  const [pollError, setPollError] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
@@ -163,7 +163,6 @@ function ConfirmationScreen({
 
 export default function PedidoPage() {
   const router = useRouter();
-
   const [items, setItems] = useState<OrderItem[]>([]);
   const [aiNotes, setAiNotes] = useState<string[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -573,7 +572,7 @@ export default function PedidoPage() {
           <CheckCircle size={17} />
           {isSubmitting ? "Enviando pedido..." : "Confirmar y enviar a cocina"}
         </button>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }

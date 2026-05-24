@@ -94,28 +94,28 @@ export default function InicioPage() {
         <div style={{ display: "flex", gap: "0.75rem", overflowX: "auto" }} className="hide-scrollbar">
           {loading
             ? [1, 2, 3, 4].map((i) => (
-                <div key={i} style={{ width: 60, height: 80, background: "#fff9f4", borderRadius: 20, opacity: 0.5 }} />
-              ))
+              <div key={i} style={{ width: 60, height: 80, background: "#fff9f4", borderRadius: 20, opacity: 0.5 }} />
+            ))
             : categories.map((cat) => {
-                const catKey = cat.name.toLowerCase();
-                return (
-                  <div
-                    key={cat.id}
-                    className="category-chip"
-                    onClick={() => router.push(`/menu?category=${encodeURIComponent(catKey)}`)}
-                  >
-                    <div className="category-chip-icon inactive">
-                      <span style={{ fontSize: "1.3rem" }}>{getCategoryEmoji(cat.name)}</span>
-                    </div>
-                    <span
-                      className="category-chip-label"
-                      style={{ fontWeight: 400 }}
-                    >
-                      {cat.name}
-                    </span>
+              const catKey = cat.name.toLowerCase();
+              return (
+                <div
+                  key={cat.id}
+                  className="category-chip"
+                  onClick={() => router.push(`/menu?category=${encodeURIComponent(catKey)}`)}
+                >
+                  <div className="category-chip-icon inactive">
+                    <span style={{ fontSize: "1.3rem" }}>{getCategoryEmoji(cat.name)}</span>
                   </div>
-                );
-              })}
+                  <span
+                    className="category-chip-label"
+                    style={{ fontWeight: 400 }}
+                  >
+                    {cat.name}
+                  </span>
+                </div>
+              );
+            })}
         </div>
       </div>
 

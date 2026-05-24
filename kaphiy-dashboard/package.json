@@ -15,6 +15,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "mock:server": "node scripts/mock-socket-server.mjs",
     "prepare": "husky"
   },
   "dependencies": {

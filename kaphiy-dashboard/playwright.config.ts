@@ -14,8 +14,14 @@ export default defineConfig({
   },
   projects: [
     {
+      // Tablet viewport but Chromium engine (avoids needing WebKit binaries on Windows CI).
+      // The iPad device profile in Playwright defaults to WebKit; override here.
       name: "tablet-chromium",
-      use: { ...devices["iPad Pro 11 landscape"] },
+      use: {
+        ...devices["iPad Pro 11 landscape"],
+        defaultBrowserType: "chromium",
+        browserName: "chromium",
+      },
     },
     {
       name: "desktop-chromium",
