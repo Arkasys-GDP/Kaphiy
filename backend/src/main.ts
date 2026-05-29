@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: ['https://kaphiy.vercel.app', 'https://kaphiy-IA.vercel.app', 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:3003', 'http://localhost:3002'],
+    origin: ['https://kaphiy.vercel.app', 'https://kaphiy-ia.vercel.app', 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:3003', 'http://localhost:3002'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
   });
