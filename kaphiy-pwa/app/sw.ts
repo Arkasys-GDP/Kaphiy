@@ -8,6 +8,7 @@ declare global {
   }
 }
 
+// @ts-ignore - Next.js default tsconfig doesn't include WebWorker types
 declare const self: ServiceWorkerGlobalScope;
 
 const serwist = new Serwist({
