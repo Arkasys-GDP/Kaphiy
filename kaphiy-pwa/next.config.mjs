@@ -8,6 +8,7 @@ const withSerwist = withSerwistInit({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {},
   async rewrites() {
     return [
       {
