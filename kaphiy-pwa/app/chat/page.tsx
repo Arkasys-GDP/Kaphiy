@@ -7,6 +7,7 @@ import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { AiBubble, UserBubble } from "@/components/chat/ChatBubble";
 import { DateDivider } from "@/components/chat/DateDivider";
+import { Sparkles } from "lucide-react";
 
 function ChatContent() {
   const {
@@ -47,12 +48,10 @@ function ChatContent() {
 
       {/* ── Messages ── */}
       <div className="chat-messages" id="chat-messages-container">
-        {/* Gemini badge */}
-        <span className="gemini-badge">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z" fill="currentColor" />
-          </svg>
-          Conversación con IA Gemini
+        {/* IA badge */}
+        <span className="ia-badge">
+          <Sparkles className="w-4 h-4" />
+          Conversación con IA
         </span>
 
         <DateDivider label="HOY" />

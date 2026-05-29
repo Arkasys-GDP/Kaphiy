@@ -1,6 +1,6 @@
 {
-  "name": "Kaphiy PWA",
-  "short_name": "Kaphiy",
+  "name": "Praliné - Kaphiy",
+  "short_name": "Praliné",
   "description": "PWA para la gestión de pedidos de café",
   "start_url": "/inicio",
   "display": "standalone",

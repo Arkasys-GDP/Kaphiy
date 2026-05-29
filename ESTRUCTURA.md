@@ -81,7 +81,7 @@ La Aplicación Web Progresiva orientada a dispositivos móviles (Mobile-First) p
   * `menu/`: Visualización del catálogo de bebidas, repostería y alimentos.
   * `pedido/`: Detalle y checkout del carrito del cliente.
   * `mis-pedidos/`: Historial y seguimiento en tiempo real del estado de los pedidos realizados.
-  * `chat/`: Chatbot asistente basado en Inteligencia Artificial (Google Gemini) para pedidos por voz o texto.
+  * `chat/`: Chatbot asistente basado en Inteligencia Artificial para pedidos por voz o texto.
 * **[components/](file:///d:/UTA/7mo%20Semestre/gps/Kaphiy/kaphiy-pwa/components)**:
   * `pwa/`: Componentes específicos de PWA (instalación, notificaciones offline, etc.).
   * `chat/`: Interfaz y lógica del chat interactivo.

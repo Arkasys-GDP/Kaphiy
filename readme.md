@@ -57,7 +57,7 @@ El ecosistema KAPHIY está compuesto por varios módulos:
 - Automatización de flujos y eventos
 
 ### 🔹 Inteligencia Artificial
-- Google Gemini (API)
+- Modelos de Lenguaje Avanzados (API)
 - Procesamiento de lenguaje natural para asistencia al cliente
 
 ### 🔹 Infraestructura

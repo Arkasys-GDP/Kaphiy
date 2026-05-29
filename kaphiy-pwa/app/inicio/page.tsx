@@ -131,7 +131,7 @@ export default function InicioPage() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-            <span className="ai-badge">✦ GEMINI IA</span>
+            <span className="ai-badge">✦ IA</span>
             <h2 className="section-title">Para ti hoy</h2>
           </div>
           <Link
@@ -211,7 +211,7 @@ export default function InicioPage() {
         </div>
       </div>
 
-      {/* ── Botón flotante Gemini ── */}
+      {/* ── Botón flotante IA ── */}
       <div
         style={{
           position: "fixed",
@@ -226,12 +226,12 @@ export default function InicioPage() {
         }}
       >
         <button
-          id="hablar-gemini-btn"
-          className="btn-gemini-fab"
+          id="hablar-ia-btn"
+          className="btn-ia-fab"
           onClick={() => router.push("/chat")}
         >
           <Sparkles size={16} />
-          Hablar con Gemini
+          Hablar con IA
         </button>
       </div>
 

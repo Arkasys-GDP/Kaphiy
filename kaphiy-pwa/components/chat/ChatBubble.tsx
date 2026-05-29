@@ -79,7 +79,7 @@ export function AiBubble({ message }: { message: Message }) {
           </div>
         )}
 
-        <span className="chat-bubble__time">{message.time} · IA Gemini</span>
+        <span className="chat-bubble__time">{message.time} · IA</span>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@
  * CPS-SYS-PWA-02: Consulta del Menú Digital y Categorías
  * CPS-SYS-PWA-03: Detalle de Producto y Navegación
  * CPS-SYS-PWA-04: Flujo de Pedido (Carrito → Confirmación)
- * CPS-SYS-PWA-05: Chat con Gemini IA
+ * CPS-SYS-PWA-05: Chat con IA
  * CPS-SYS-PWA-06: Mis Pedidos — Historial
  * CPS-SYS-PWA-07: Accesibilidad WCAG 2.1 AA
  * CPS-SYS-PWA-08: Comportamiento Offline y Service Worker
@@ -52,7 +52,7 @@ test.describe("CPS-SYS-PWA-01 · Carga Inicial y Bienvenida", () => {
     console.log("[SYS-PWA-01-B] ✓ Marca PRALINÉ visible en /inicio");
   });
 
-  test("SYS-PWA-01-C · La página /inicio muestra la sección 'Para ti hoy' (IA Gemini)", async ({ page }) => {
+  test("SYS-PWA-01-C · La página /inicio muestra la sección 'Para ti hoy' (IA)", async ({ page }) => {
     await page.goto("/inicio");
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(3000);
@@ -75,14 +75,14 @@ test.describe("CPS-SYS-PWA-01 · Carga Inicial y Bienvenida", () => {
     expect(count).toBeGreaterThanOrEqual(3);
   });
 
-  test("SYS-PWA-01-E · El botón flotante 'Hablar con Gemini' es visible", async ({ page }) => {
+  test("SYS-PWA-01-E · El botón flotante 'Hablar con IA' es visible", async ({ page }) => {
     await page.goto("/inicio");
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1000);
 
-    const geminiBtn = page.locator("#hablar-gemini-btn");
+    const geminiBtn = page.locator("#hablar-ia-btn");
     await expect(geminiBtn).toBeVisible({ timeout: 8000 });
-    console.log("[SYS-PWA-01-E] ✓ Botón flotante Gemini visible");
+    console.log("[SYS-PWA-01-E] ✓ Botón flotante IA visible");
   });
 });
 
@@ -250,10 +250,10 @@ test.describe("CPS-SYS-PWA-04 · Flujo de Pedido", () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CPS-SYS-PWA-05 · Chat con Gemini IA
+// CPS-SYS-PWA-05 · Chat con IA
 // ─────────────────────────────────────────────────────────────────────────────
 
-test.describe("CPS-SYS-PWA-05 · Chat con Gemini IA", () => {
+test.describe("CPS-SYS-PWA-05 · Chat con IA", () => {
   test("SYS-PWA-05-A · La página /chat carga correctamente", async ({ page }) => {
     await page.goto("/chat");
     await page.waitForLoadState("networkidle");
@@ -263,18 +263,18 @@ test.describe("CPS-SYS-PWA-05 · Chat con Gemini IA", () => {
     console.log("[SYS-PWA-05-A] ✓ Página /chat accesible");
   });
 
-  test("SYS-PWA-05-B · El botón flotante 'Hablar con Gemini' navega a /chat", async ({ page }) => {
+  test("SYS-PWA-05-B · El botón flotante 'Hablar con IA' navega a /chat", async ({ page }) => {
     await page.goto("/inicio");
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1000);
 
-    const geminiBtn = page.locator("#hablar-gemini-btn");
+    const geminiBtn = page.locator("#hablar-ia-btn");
     await expect(geminiBtn).toBeVisible({ timeout: 8000 });
     await geminiBtn.click();
 
     await page.waitForURL(/\/chat/, { timeout: 8000 });
     await expect(page).toHaveURL(/\/chat/);
-    console.log("[SYS-PWA-05-B] ✓ Botón Gemini navega a /chat correctamente");
+    console.log("[SYS-PWA-05-B] ✓ Botón IA navega a /chat correctamente");
   });
 
   test("SYS-PWA-05-C · El área de chat tiene un campo de entrada de mensaje", async ({ page }) => {
