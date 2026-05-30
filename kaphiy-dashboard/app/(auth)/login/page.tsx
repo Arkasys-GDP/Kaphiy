@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/features/auth/store/authSlice";
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
@@ -29,15 +30,20 @@ export default function LoginPage() {
 
   const errorMsg = isError
     ? (error?.status === 401 || error?.status === 400
-        ? "PIN incorrecto. Intenta de nuevo."
-        : "Error de servidor. Contacta al administrador.")
+      ? "PIN incorrecto. Intenta de nuevo."
+      : "Error de servidor. Contacta al administrador.")
     : null;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--background)] px-6">
-      <h1 className="font-display mb-2 text-4xl font-semibold tracking-widest text-[var(--praline)]">
-        PRALIN<em className="not-italic text-[var(--crema)]">É</em>
-      </h1>
+      <Image
+        src="/logoCB.png"
+        alt="Praliné Coffee House"
+        width={600}
+        height={300}
+        priority
+        className="mb-2 h-20 w-auto object-contain"
+      />
       <p className="mb-10 text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">
         Panel de Cocina
       </p>

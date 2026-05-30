@@ -104,20 +104,30 @@
 /* ── Light (default) — warm cream + sage olive ──── */
 :root {
     /* Brand */
-    --paper: oklch(0.985 0.010 75);     /* #fff9f4 surface       */
-    --ink: oklch(0.28 0.013 100);       /* #3e3b30 dark olive    */
-    --espresso: oklch(0.32 0.054 40);   /* #5A3A2E coffee deep   */
-    --praline: oklch(0.58 0.075 22);    /* deepened dusty rose for WCAG AA contrast on cream bg (3:1+) */
-    --crema: oklch(0.91 0.018 70);      /* #EFE3D6 cream         */
-    --rose: oklch(0.59 0.045 25);       /* #A27572 rosa viejo    */
-    --sage: oklch(0.74 0.025 130);      /* #A9B5A2 verde claro   */
+    --paper: oklch(0.985 0.010 75);
+    /* #fff9f4 surface       */
+    --ink: oklch(0.28 0.013 100);
+    /* #3e3b30 dark olive    */
+    --espresso: oklch(0.32 0.054 40);
+    /* #5A3A2E coffee deep   */
+    --praline: oklch(60.34% 0.057 23.21);
+    /* deepened dusty rose for WCAG AA contrast on cream bg (3:1+) */
+    --crema: oklch(0.91 0.018 70);
+    /* #EFE3D6 cream         */
+    --rose: oklch(60.34% 0.057 23.21);
+    /* #A27572 rosa viejo    */
+    --sage: oklch(0.74 0.025 130);
+    /* #A9B5A2 verde claro   */
 
     /* Semaphore — saturated enough to read against rose TopBar.
        Hue distance from --praline (rose, h≈25) chosen for max distinguishability:
        ok = green (h≈145), warn = amber (h≈75), alert = vermilion (h≈18). */
-    --sem-ok: oklch(0.55 0.14 145);     /* deep sage green     */
-    --sem-warn: oklch(0.65 0.16 75);    /* amber               */
-    --sem-alert: oklch(0.52 0.21 18);   /* vermilion (deeper red — distinguishable from rose) */
+    --sem-ok: oklch(0.55 0.14 145);
+    /* deep sage green     */
+    --sem-warn: oklch(0.65 0.16 75);
+    /* amber               */
+    --sem-alert: oklch(0.52 0.21 18);
+    /* vermilion (deeper red — distinguishable from rose) */
 
     /* shadcn semantic mapping */
     --background: var(--paper);
@@ -128,14 +138,17 @@
     --popover-foreground: var(--ink);
     --primary: var(--praline);
     --primary-foreground: var(--paper);
-    --secondary: oklch(0.95 0.014 70);  /* #f9f1e9 alt cream */
+    --secondary: oklch(0.95 0.014 70);
+    /* #f9f1e9 alt cream */
     --secondary-foreground: var(--ink);
     --muted: oklch(0.95 0.014 70);
-    --muted-foreground: oklch(0.51 0.040 45); /* #8a6555 muted brown */
+    --muted-foreground: oklch(0.51 0.040 45);
+    /* #8a6555 muted brown */
     --accent: var(--rose);
     --accent-foreground: var(--paper);
     --destructive: var(--sem-alert);
-    --border: oklch(0.83 0.024 65);     /* #d8c8b8 soft tan */
+    --border: oklch(0.83 0.024 65);
+    /* #d8c8b8 soft tan */
     --input: oklch(0.88 0.018 65);
     --ring: var(--praline);
 
@@ -154,12 +167,14 @@
 
 /* ── Dark — deep olive-coffee + cream text ──────── */
 .dark {
-    --paper: oklch(0.16 0.005 80);     /* #1a1814 deep dark */
-    --ink: oklch(0.91 0.018 70);       /* cream as text     */
+    --paper: oklch(0.16 0.005 80);
+    /* #1a1814 deep dark */
+    --ink: oklch(0.91 0.018 70);
+    /* cream as text     */
     --espresso: oklch(0.13 0.005 80);
-    --praline: oklch(0.68 0.045 25);  /* lighter olive for AA contrast */
+    --praline: oklch(60.34% 0.057 23.21);
     --crema: oklch(0.85 0.020 70);
-    --rose: oklch(0.68 0.045 25);
+    --rose: oklch(60.34% 0.057 23.21);
     --sage: oklch(0.78 0.025 130);
 
     --sem-ok: oklch(0.78 0.15 145);
@@ -200,10 +215,12 @@
     * {
         @apply border-border outline-ring/50;
     }
+
     html {
         @apply font-sans;
         font-feature-settings: "ss01", "cv11";
     }
+
     body {
         @apply bg-background text-foreground;
         -webkit-font-smoothing: antialiased;
@@ -223,6 +240,7 @@
         background-image: url("/grain.svg");
         background-size: 180px 180px;
     }
+
     .dark body::before {
         opacity: 0.04;
         mix-blend-mode: overlay;
@@ -260,11 +278,13 @@
             box-shadow var(--dur-snap) var(--ease-snap),
             border-color var(--dur-snap) var(--ease-snap);
     }
+
     .ticket-card:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-ticket-hover);
         border-color: color-mix(in oklch, var(--praline) 30%, var(--border));
     }
+
     /* Perforación lateral (signature) */
     .ticket-card::before,
     .ticket-card::after {
@@ -273,16 +293,20 @@
         top: 0;
         bottom: 0;
         width: 6px;
-        background-image: radial-gradient(
-            circle at center,
-            var(--background) 3px,
-            transparent 3.5px
-        );
+        background-image: radial-gradient(circle at center,
+                var(--background) 3px,
+                transparent 3.5px);
         background-size: 6px 12px;
         background-repeat: repeat-y;
     }
-    .ticket-card::before { left: -3px; }
-    .ticket-card::after { right: -3px; }
+
+    .ticket-card::before {
+        left: -3px;
+    }
+
+    .ticket-card::after {
+        right: -3px;
+    }
 
     .ticket-divider {
         border: 0;
@@ -298,20 +322,45 @@
         color: var(--ink);
     }
 
-    .semaphore-ok    { background: color-mix(in oklch, var(--sem-ok) 15%, transparent);    color: var(--sem-ok); }
-    .semaphore-warn  { background: color-mix(in oklch, var(--sem-warn) 18%, transparent);  color: var(--sem-warn); }
-    .semaphore-alert { background: color-mix(in oklch, var(--sem-alert) 18%, transparent); color: var(--sem-alert); }
+    .semaphore-ok {
+        background: color-mix(in oklch, var(--sem-ok) 15%, transparent);
+        color: var(--sem-ok);
+    }
+
+    .semaphore-warn {
+        background: color-mix(in oklch, var(--sem-warn) 18%, transparent);
+        color: var(--sem-warn);
+    }
+
+    .semaphore-alert {
+        background: color-mix(in oklch, var(--sem-alert) 18%, transparent);
+        color: var(--sem-alert);
+    }
 }
 
 /* Keyframes */
 @keyframes order-item-flash {
-    0%, 100% { background: transparent; }
-    50% { background: color-mix(in oklch, var(--praline) 10%, transparent); }
+
+    0%,
+    100% {
+        background: transparent;
+    }
+
+    50% {
+        background: color-mix(in oklch, var(--praline) 10%, transparent);
+    }
 }
 
 @keyframes card-entrance {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .ticket-card {
@@ -320,6 +369,7 @@
 
 /* Reduced motion — accessibility */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
