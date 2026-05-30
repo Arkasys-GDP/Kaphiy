@@ -5,11 +5,13 @@ import { MapPin, Search, ChevronRight, Sparkles, TrendingUp } from "lucide-react
 import { BottomNav } from "@/components/pwa/BottomNav";
 import { FeaturedCard } from "@/components/pwa/FeaturedCard";
 import { ProductListItem } from "@/components/pwa/ProductListItem";
-import { getProducts, getCategories, adaptProduct, ApiCategory } from "@/lib/api";
+import { getProducts, getCategories, adaptProduct, type ApiCategory } from "@/lib/api";
+import { uniqueCategories } from "@/lib/categories";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
+type ProductBadgeType = "green" | "rose" | "muted" | "dark";
 
 const CATEGORY_EMOJIS: Record<string, string> = {
   café: "☕",
@@ -25,6 +27,12 @@ function getCategoryEmoji(name: string): string {
   return key ? CATEGORY_EMOJIS[key] : CATEGORY_EMOJIS.default;
 }
 
+function normalizeBadgeTypes(types: string[]): ProductBadgeType[] {
+  return types.filter((type): type is ProductBadgeType =>
+    ["green", "rose", "muted", "dark"].includes(type),
+  );
+}
+
 export default function InicioPage() {
   const router = useRouter();
   const [products, setProducts] = useState<AdaptedProduct[]>([]);
@@ -36,7 +44,7 @@ export default function InicioPage() {
     Promise.all([getProducts(), getCategories()])
       .then(([prods, cats]) => {
         setProducts(prods.map(adaptProduct));
-        setCategories(cats);
+        setCategories(uniqueCategories(cats));
         setLoading(false);
       })
       .catch(() => {
@@ -199,7 +207,7 @@ export default function InicioPage() {
                 description={item.description}
                 price={item.price}
                 badges={item.badges}
-                badgeTypes={item.badgeTypes as any}
+                badgeTypes={normalizeBadgeTypes(item.badgeTypes)}
                 imageUrl={item.imageUrl}
               />
             ))
@@ -215,7 +223,7 @@ export default function InicioPage() {
       <div
         style={{
           position: "fixed",
-          bottom: "5.5rem",
+          bottom: "5.25rem",
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 40,
@@ -223,14 +231,16 @@ export default function InicioPage() {
           maxWidth: 430,
           display: "flex",
           justifyContent: "center",
+          pointerEvents: "none",
         }}
       >
         <button
           id="hablar-ia-btn"
           className="btn-ia-fab"
           onClick={() => router.push("/chat")}
+          style={{ pointerEvents: "auto" }}
         >
-          <Sparkles size={16} />
+          <Sparkles size={17} strokeWidth={2.4} />
           Hablar con IA
         </button>
       </div>

@@ -22,6 +22,7 @@ export interface ApiProductIngredient {
 
 export interface ApiProduct {
   id: number;
+  legacyId?: number | null;
   name: string;
   price: number | string;
   aiDescription?: string;
@@ -62,11 +63,11 @@ export async function getCategories(): Promise<ApiCategory[]> {
 // ─── Endpoints de Órdenes ─────────────────────────────────────────────────────
 
 export interface CreateOrderDto {
-  tableId?: number;
+  tableId: number;
   chatSessionId?: string;
   paymentCode?: string;
-  paymentStatus?: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
-  kitchenStatus?: 'PENDING' | 'PREPARING' | 'READY' | 'DELIVERED' | 'CANCELLED';
+  paymentStatus?: "PENDING" | "PAID" | "CANCELLED";
+  kitchenStatus?: "WAITING" | "PREPARING" | "READY" | "DELIVERED" | "OUT_OF_STOCK";
   items: {
     productId: number;
     quantity: number;
@@ -74,16 +75,46 @@ export interface CreateOrderDto {
   }[];
 }
 
-export async function createOrder(data: CreateOrderDto): Promise<any> {
+export interface ApiOrder {
+  id: number;
+  tableId?: number;
+  chatSessionId?: string | null;
+  paymentCode?: string | null;
+  total?: number | string | null;
+  paymentStatus?: "PENDING" | "PAID" | "CANCELLED";
+  kitchenStatus?: "WAITING" | "PREPARING" | "READY" | "DELIVERED" | "OUT_OF_STOCK";
+}
+
+async function readErrorMessage(res: Response): Promise<string> {
+  try {
+    const body = await res.json();
+    if (typeof body?.message === "string") return body.message;
+    if (Array.isArray(body?.message)) return body.message.join(", ");
+  } catch {
+    // Try plain text below.
+  }
+
+  try {
+    const text = await res.text();
+    if (text) return text;
+  } catch {
+    // Keep generic message.
+  }
+
+  return `API error ${res.status}`;
+}
+
+export async function createOrder(data: CreateOrderDto): Promise<ApiOrder> {
   const res = await fetch(`${BASE_URL}/orders`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
   if (!res.ok) {
-    throw new Error(`API error ${res.status} al crear la orden`);
+    const detail = await readErrorMessage(res);
+    throw new Error(`API error ${res.status} al crear la orden: ${detail}`);
   }
-  return res.json();
+  return res.json() as Promise<ApiOrder>;
 }
 
 // ─── Utilidades de adaptación de datos ────────────────────────────────────────
@@ -122,6 +153,8 @@ export function adaptProduct(p: ApiProduct) {
 
   return {
     id: String(p.id),
+    productId: p.id,
+    legacyId: p.legacyId ?? null,
     name: p.name,
     category: categoryKey,
     categoryLabel: p.category?.name ?? "Menú",

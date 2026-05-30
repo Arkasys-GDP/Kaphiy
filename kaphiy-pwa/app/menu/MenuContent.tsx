@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { MapPin, Search, ChevronDown, ChevronRight } from "lucide-react";
 import { BottomNav } from "@/components/pwa/BottomNav";
 import { ProductListItem } from "@/components/pwa/ProductListItem";
-import { getProducts, getCategories, adaptProduct, ApiCategory } from "@/lib/api";
+import { getProducts, getCategories, adaptProduct, type ApiCategory } from "@/lib/api";
+import { uniqueCategories } from "@/lib/categories";
 import { useSearchParams, useRouter } from "next/navigation";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
+type ProductBadgeType = "green" | "rose" | "muted" | "dark";
 
 const CATEGORY_EMOJIS: Record<string, string> = {
   café: "☕",
@@ -21,6 +23,12 @@ const CATEGORY_EMOJIS: Record<string, string> = {
 function getCategoryEmoji(name: string): string {
   const key = Object.keys(CATEGORY_EMOJIS).find((k) => name.toLowerCase().includes(k));
   return key ? CATEGORY_EMOJIS[key] : CATEGORY_EMOJIS.default;
+}
+
+function normalizeBadgeTypes(types: string[]): ProductBadgeType[] {
+  return types.filter((type): type is ProductBadgeType =>
+    ["green", "rose", "muted", "dark"].includes(type),
+  );
 }
 
 export function MenuContent() {
@@ -44,7 +52,7 @@ export function MenuContent() {
     Promise.all([getProducts(), getCategories()])
       .then(([prods, cats]) => {
         setProducts(prods.map(adaptProduct));
-        setCategories(cats);
+        setCategories(uniqueCategories(cats));
         setLoading(false);
       })
       .catch(() => {
@@ -185,7 +193,7 @@ export function MenuContent() {
                   description={prod.description}
                   price={prod.price}
                   badges={prod.badges}
-                  badgeTypes={prod.badgeTypes as any}
+                  badgeTypes={normalizeBadgeTypes(prod.badgeTypes)}
                   imageUrl={prod.imageUrl}
                 />
               ))}
@@ -227,7 +235,7 @@ export function MenuContent() {
                         description={prod.description}
                         price={prod.price}
                         badges={prod.badges}
-                        badgeTypes={prod.badgeTypes as any}
+                        badgeTypes={normalizeBadgeTypes(prod.badgeTypes)}
                         imageUrl={prod.imageUrl}
                       />
                     ))}

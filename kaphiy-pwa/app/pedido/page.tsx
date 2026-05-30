@@ -1,59 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, CheckCircle, CreditCard, Banknote, Minus, Plus, Lock } from "lucide-react";
+import { ChevronLeft, CheckCircle, Minus, Plus, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createOrder, getProducts, adaptProduct } from "@/lib/api";
+import {
+  buildOrderItems,
+  getInvalidOrderItems,
+  normalizeCartItems,
+  type PendingOrderItem,
+} from "@/lib/order";
 
-type PaymentMethod = "qr" | "cash";
-
-interface OrderItem {
-  id: string;
-  name: string;
-  price: number;
-  qty: number;
-}
+type AdaptedProduct = ReturnType<typeof adaptProduct>;
 
 const IVA_RATE = 0.15;
-
-const PAYMENT_OPTIONS: { id: PaymentMethod; label: string; Icon: typeof CreditCard }[] = [
-  { id: "qr", label: "Transferencia / QR", Icon: CreditCard },
-  { id: "cash", label: "Efectivo en caja", Icon: Banknote },
-];
-
-function QRPlaceholder() {
-  return (
-    <div
-      style={{
-        width: 140,
-        height: 140,
-        background: "#fff",
-        borderRadius: 12,
-        padding: 10,
-        display: "grid",
-        gridTemplateColumns: "repeat(7, 1fr)",
-        gap: 2,
-      }}
-    >
-      {Array.from({ length: 49 }).map((_, i) => {
-        const filled =
-          (i % 7 < 3 && i < 21) ||
-          (i % 7 > 3 && i < 21) ||
-          (i % 7 < 3 && i > 27) ||
-          i === 24 ||
-          (i % 3 === 0 && i > 20 && i < 28) ||
-          (i % 5 === 0 && i > 21);
-        return (
-          <div
-            key={i}
-            style={{ borderRadius: 2, background: filled ? "#1a1a1a" : "transparent" }}
-          />
-        );
-      })}
-    </div>
-  );
-}
 
 // ── Mapas de estado ────────────────────────────────────────────────────────────
 const KITCHEN_LABELS: Record<string, { label: string; emoji: string; color: string; bg: string }> = {
@@ -163,15 +124,15 @@ function ConfirmationScreen({
 
 export default function PedidoPage() {
   const router = useRouter();
-  const [items, setItems] = useState<OrderItem[]>([]);
+  const [items, setItems] = useState<PendingOrderItem[]>([]);
   const [aiNotes, setAiNotes] = useState<string[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("qr");
   const [confirmed, setConfirmed] = useState(false);
   const [confirmedOrderId, setConfirmedOrderId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [orderError, setOrderError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadOrderAndEnrich() {
@@ -188,11 +149,14 @@ export default function PedidoPage() {
       }
 
       try {
-        const parsed = JSON.parse(saved);
-        const rawItems = parsed.cartItems || [];
-        setAiNotes(parsed.aiNotes || []);
+        const parsed = JSON.parse(saved) as { cartItems?: unknown[]; aiNotes?: unknown[] };
+        const rawItems = Array.isArray(parsed.cartItems) ? parsed.cartItems : [];
+        const notes = Array.isArray(parsed.aiNotes)
+          ? parsed.aiNotes.map((note) => String(note)).filter(Boolean)
+          : [];
+        setAiNotes(notes);
 
-        let realProducts: any[] = [];
+        let realProducts: AdaptedProduct[] = [];
         try {
           const apiProds = await getProducts();
           realProducts = apiProds.map(adaptProduct);
@@ -200,38 +164,22 @@ export default function PedidoPage() {
           console.error("Error fetching products for enrichment:", apiErr);
         }
 
-        const enrichedItems: OrderItem[] = rawItems.map((item: any, idx: number) => {
-          const itemIdStr = String(item.id || item.productId || "");
-          const itemNameRaw = item.productName || item.name || item.nombre || "";
-          const itemNameStr = String(itemNameRaw).trim().toLowerCase();
-
-          const matchedProd = realProducts.find((p) => {
-            if (itemIdStr && String(p.id) === itemIdStr) return true;
-            if (itemNameStr && p.name.trim().toLowerCase() === itemNameStr) return true;
-            return false;
-          });
-
-          const rawPrice = matchedProd
-            ? matchedProd.price
-            : parseFloat(String(item.unitPrice || item.price || item.precio || 0));
-          const finalPrice = isNaN(rawPrice) ? 0 : rawPrice;
-          const finalName = matchedProd
-            ? matchedProd.name
-            : (item.productName || item.name || item.nombre || "Producto");
-          const finalId = matchedProd ? String(matchedProd.id) : (itemIdStr || `temp-${idx}`);
-
-          return {
-            id: finalId,
-            name: finalName,
-            price: finalPrice,
-            qty: parseInt(String(item.qty ?? item.cantidad ?? item.quantity ?? 1), 10) || 1,
-          };
-        });
+        const enrichedItems = normalizeCartItems(rawItems, realProducts);
+        const invalidItems = getInvalidOrderItems(enrichedItems);
+        if (rawItems.length === 0 || invalidItems.length > 0) {
+          localStorage.removeItem("current_order");
+          setItems([]);
+          setQuantities({});
+          setOrderError(
+            "Elige un producto del menu o vuelve al chat para intentarlo otra vez.",
+          );
+          return;
+        }
 
         setItems(enrichedItems);
 
         const initialQtys: Record<string, number> = {};
-        enrichedItems.forEach((item: OrderItem) => {
+        enrichedItems.forEach((item) => {
           initialQtys[item.id] = item.qty || 1;
         });
         setQuantities(initialQtys);
@@ -243,7 +191,7 @@ export default function PedidoPage() {
     }
 
     loadOrderAndEnrich();
-  }, []);
+  }, [router]);
 
   const updateQty = (id: string, delta: number) => {
     setQuantities((prev) => ({ ...prev, [id]: Math.max(1, (prev[id] ?? 1) + delta) }));
@@ -271,14 +219,18 @@ export default function PedidoPage() {
         localStorage.setItem("chat_session_id", chatSessionId);
       }
 
-      const payload: any = {
+      const { orderItems, invalidItems } = buildOrderItems(items, quantities, aiNotes);
+      if (invalidItems.length > 0 || orderItems.length === 0) {
+        setSubmitError(
+          "No se pudo enviar el pedido. Revisa el producto y vuelve a intentarlo.",
+        );
+        return;
+      }
+
+      const payload = {
         tableId: 1,
         chatSessionId,
-        items: items.map(item => ({
-          productId: parseInt(item.id, 10),
-          quantity: quantities[item.id] ?? 1,
-          aiNotes: aiNotes.length > 0 ? aiNotes.join(", ") : undefined,
-        })),
+        items: orderItems,
         paymentStatus: 'PENDING' as const,
         kitchenStatus: 'WAITING' as const,
       };
@@ -296,7 +248,7 @@ export default function PedidoPage() {
       setConfirmed(true);
     } catch (err) {
       console.error(err);
-      setSubmitError("Error al enviar el pedido. Por favor intenta de nuevo.");
+      setSubmitError(err instanceof Error ? err.message : "Error al enviar el pedido. Por favor intenta de nuevo.");
     } finally {
       setIsSubmitting(false);
     }
@@ -310,7 +262,7 @@ export default function PedidoPage() {
 
   if (confirmed) {
     return <ConfirmationScreen total={total} orderId={confirmedOrderId} onBack={() => {
-      router.push("/mis-pedidos");
+      router.replace("/mis-pedidos");
     }} />;
   }
 
@@ -318,11 +270,18 @@ export default function PedidoPage() {
     return (
       <div style={{ minHeight: "100dvh", background: "var(--color-praline-bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem", gap: "1.5rem", textAlign: "center" }}>
         <span style={{ fontSize: "4rem" }}>🛒</span>
-        <h2 className="section-title">Tu carrito está vacío</h2>
-        <p style={{ color: "var(--color-praline-muted)", fontSize: "0.9rem" }}>Aún no has confirmado un pedido con KAPHY.</p>
-        <Link href="/chat" style={{ textDecoration: "none" }}>
-          <button className="btn-primary" style={{ padding: "0.8rem 2rem" }}>Volver al Chat</button>
-        </Link>
+        <h2 className="section-title">{orderError ? "No pudimos preparar tu pedido" : "Tu carrito está vacío"}</h2>
+        <p style={{ color: "var(--color-praline-muted)", fontSize: "0.9rem" }}>
+          {orderError ?? "Aún no has confirmado un pedido con KAPHY."}
+        </p>
+        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", justifyContent: "center" }}>
+          <Link href="/chat" style={{ textDecoration: "none" }}>
+            <button className="btn-primary" style={{ padding: "0.8rem 2rem" }}>Volver al Chat</button>
+          </Link>
+          <Link href="/menu" style={{ textDecoration: "none" }}>
+            <button className="btn-secondary" style={{ padding: "0.8rem 2rem" }}>Ver menú</button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -378,9 +337,19 @@ export default function PedidoPage() {
                       background: "#f0e8de", display: "flex",
                       alignItems: "center", justifyContent: "center",
                       fontSize: "1.3rem", flexShrink: 0,
+                      overflow: "hidden",
                     }}
                   >
-                    ☕
+                    {item.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      item.emoji ?? "☕"
+                    )}
                   </div>
 
                   <div style={{ flex: 1 }}>
