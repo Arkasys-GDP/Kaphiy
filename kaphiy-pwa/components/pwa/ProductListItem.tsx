@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 type BadgeType = "green" | "rose" | "muted" | "dark";
 
@@ -26,30 +27,30 @@ export function ProductListItem({
   return (
     <Link href={`/menu/${id}`} style={{ textDecoration: "none" }}>
       <div className="product-list-item">
-        {/* Image/Emoji icon */}
         <div
           className="product-item__icon"
           style={{
             padding: imageUrl ? 0 : undefined,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden'
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            position: "relative",
           }}
         >
           {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={imageUrl}
               alt={name}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              fill
+              sizes="60px"
+              style={{ objectFit: "cover" }}
             />
           ) : (
             emoji
           )}
         </div>
 
-        {/* Info */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="product-item__name">{name}</div>
           <div className="product-item__desc">{description}</div>
@@ -67,7 +68,6 @@ export function ProductListItem({
           )}
         </div>
 
-        {/* Price */}
         <div className="product-item__price">${price.toFixed(2)}</div>
       </div>
     </Link>

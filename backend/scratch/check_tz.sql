@@ -1,1 +1,0 @@
-SELECT table_name, column_name, data_type FROM information_schema.columns WHERE (table_name='orders' AND column_name IN ('created_at','deleted_at')) OR (table_name='baristas' AND column_name='created_at') OR (table_name='products' AND column_name='image_url');

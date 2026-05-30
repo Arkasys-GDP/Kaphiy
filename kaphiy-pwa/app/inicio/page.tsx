@@ -5,25 +5,12 @@ import { MapPin, Search, ChevronRight, Sparkles, TrendingUp } from "lucide-react
 import { BottomNav } from "@/components/pwa/BottomNav";
 import { FeaturedCard } from "@/components/pwa/FeaturedCard";
 import { ProductListItem } from "@/components/pwa/ProductListItem";
-import { getProducts, getCategories, adaptProduct, ApiCategory } from "@/lib/api";
+import { getProducts, getCategories, adaptProduct, getCategoryEmoji, ApiCategory } from "@/lib/api";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
-
-const CATEGORY_EMOJIS: Record<string, string> = {
-  café: "☕",
-  bebidas: "🧋",
-  postres: "🍰",
-  snacks: "🥪",
-  especiales: "✨",
-  default: "🍽️",
-};
-
-function getCategoryEmoji(name: string): string {
-  const key = Object.keys(CATEGORY_EMOJIS).find((k) => name.toLowerCase().includes(k));
-  return key ? CATEGORY_EMOJIS[key] : CATEGORY_EMOJIS.default;
-}
 
 export default function InicioPage() {
   const router = useRouter();
@@ -64,8 +51,15 @@ export default function InicioPage() {
           </div>
         </div>
 
-        <div className="page-header__brand">
-          <h1 className="page-header__brand-name">PRALINÉ</h1>
+        <div className="page-header__brand" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <Image
+            src="/logoCB.png"
+            alt="Praliné Coffee House"
+            width={250}
+            height={80}
+            priority
+            style={{ height: 100, width: "auto", objectFit: "contain" }}
+          />
           <p className="page-header__brand-sub">COFFEE HOUSE · SPECIALTY</p>
         </div>
 
@@ -199,7 +193,7 @@ export default function InicioPage() {
                 description={item.description}
                 price={item.price}
                 badges={item.badges}
-                badgeTypes={item.badgeTypes as any}
+                badgeTypes={item.badgeTypes}
                 imageUrl={item.imageUrl}
               />
             ))
@@ -231,7 +225,7 @@ export default function InicioPage() {
           onClick={() => router.push("/chat")}
         >
           <Sparkles size={16} />
-          Hablar con IA
+          Pide con KAPHIY
         </button>
       </div>
 

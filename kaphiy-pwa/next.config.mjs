@@ -17,6 +17,13 @@ const nextConfig = {
       },
     ]
   },
+  images: {
+    // Allow remote product images uploaded to backend.
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: 'localhost' },
+    ],
+  },
 }
 
 export default withSerwist(nextConfig);

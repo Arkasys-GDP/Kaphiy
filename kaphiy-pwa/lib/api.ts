@@ -1,7 +1,8 @@
+import type { KitchenStatus, PaymentStatus } from "./order-status";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
-// ─── Tipos que devuelve el backend ────────────────────────────────────────────
+// ─── Backend response types ───────────────────────────────────────────────────
 
 export interface ApiCategory {
   id: number;
@@ -32,18 +33,21 @@ export interface ApiProduct {
   productIngredients: ApiProductIngredient[];
 }
 
+export interface ApiOrder {
+  id: number;
+  kitchenStatus: KitchenStatus;
+  paymentStatus: PaymentStatus;
+  total: string | number | null;
+  createdAt: string;
+}
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    throw new Error(`API error ${res.status} en ${path}`);
-  }
+  const res = await fetch(`${BASE_URL}${path}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`API error ${res.status} en ${path}`);
   return res.json() as Promise<T>;
 }
 
-// ─── Endpoints de Productos ───────────────────────────────────────────────────
+// ─── Products ─────────────────────────────────────────────────────────────────
 
 export async function getProducts(): Promise<ApiProduct[]> {
   return get<ApiProduct[]>("/products");
@@ -53,20 +57,20 @@ export async function getProduct(id: number): Promise<ApiProduct> {
   return get<ApiProduct>(`/products/${id}`);
 }
 
-// ─── Endpoints de Categorías ──────────────────────────────────────────────────
+// ─── Categories ───────────────────────────────────────────────────────────────
 
 export async function getCategories(): Promise<ApiCategory[]> {
   return get<ApiCategory[]>("/categories");
 }
 
-// ─── Endpoints de Órdenes ─────────────────────────────────────────────────────
+// ─── Orders ───────────────────────────────────────────────────────────────────
 
 export interface CreateOrderDto {
   tableId?: number;
   chatSessionId?: string;
   paymentCode?: string;
-  paymentStatus?: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
-  kitchenStatus?: 'PENDING' | 'PREPARING' | 'READY' | 'DELIVERED' | 'CANCELLED';
+  paymentStatus?: PaymentStatus;
+  kitchenStatus?: KitchenStatus;
   items: {
     productId: number;
     quantity: number;
@@ -74,44 +78,50 @@ export interface CreateOrderDto {
   }[];
 }
 
-export async function createOrder(data: CreateOrderDto): Promise<any> {
+export async function createOrder(data: CreateOrderDto): Promise<ApiOrder> {
   const res = await fetch(`${BASE_URL}/orders`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) {
-    throw new Error(`API error ${res.status} al crear la orden`);
-  }
+  if (!res.ok) throw new Error(`API error ${res.status} al crear la orden`);
   return res.json();
 }
 
-// ─── Utilidades de adaptación de datos ────────────────────────────────────────
+// ─── Adapters ─────────────────────────────────────────────────────────────────
+
+const CATEGORY_EMOJIS: Record<string, string> = {
+  café: "☕",
+  cafe: "☕",
+  coffee: "☕",
+  brunch: "🍳",
+  pasteles: "🥐",
+  pastelería: "🥐",
+  pasteleria: "🥐",
+  galletas: "🍪",
+  bebidas: "🧋",
+  especiales: "🍵",
+  postres: "🍰",
+  snacks: "🥪",
+  default: "🍽️",
+};
+
+/** Pick best-match emoji for category name. Exposed for use across pages. */
+export function getCategoryEmoji(name: string): string {
+  const key = name.toLowerCase();
+  const match = Object.entries(CATEGORY_EMOJIS).find(([k]) => key.includes(k));
+  return match?.[1] ?? CATEGORY_EMOJIS.default;
+}
 
 export function adaptProduct(p: ApiProduct) {
-  const categoryEmojis: Record<string, string> = {
-    café: "☕",
-    cafe: "☕",
-    coffee: "☕",
-    brunch: "🍳",
-    pasteles: "🥐",
-    pastelería: "🥐",
-    pasteleria: "🥐",
-    galletas: "🍪",
-    bebidas: "🧋",
-    especiales: "🍵",
-    default: "🍽️",
-  };
   const categoryKey = p.category?.name?.toLowerCase() ?? "default";
-  const emoji =
-    Object.entries(categoryEmojis).find(([k]) => categoryKey.includes(k))?.[1] ??
-    categoryEmojis.default;
+  const emoji = getCategoryEmoji(p.category?.name ?? "default");
 
   const ingredientNames = p.productIngredients?.map((pi) => pi.ingredient.name) ?? [];
 
   const badges: string[] = [];
-  const badgeTypes: string[] = [];
-  if (ingredientNames.some((n) => n.toLowerCase().includes("avena") || n.toLowerCase().includes("oat"))) {
+  const badgeTypes: ("green" | "rose" | "muted" | "dark")[] = [];
+  if (ingredientNames.some((n) => /avena|oat/i.test(n))) {
     badges.push("Oat Milk");
     badgeTypes.push("green");
   }

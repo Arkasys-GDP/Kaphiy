@@ -1,27 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { MapPin, Search, ChevronDown, ChevronRight } from "lucide-react";
 import { BottomNav } from "@/components/pwa/BottomNav";
 import { ProductListItem } from "@/components/pwa/ProductListItem";
-import { getProducts, getCategories, adaptProduct, ApiCategory } from "@/lib/api";
+import { getProducts, getCategories, adaptProduct, getCategoryEmoji, ApiCategory } from "@/lib/api";
 import { useSearchParams, useRouter } from "next/navigation";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
-
-const CATEGORY_EMOJIS: Record<string, string> = {
-  café: "☕",
-  bebidas: "🧋",
-  postres: "🍰",
-  snacks: "🥪",
-  especiales: "✨",
-  default: "🍽️",
-};
-
-function getCategoryEmoji(name: string): string {
-  const key = Object.keys(CATEGORY_EMOJIS).find((k) => name.toLowerCase().includes(k));
-  return key ? CATEGORY_EMOJIS[key] : CATEGORY_EMOJIS.default;
-}
 
 export function MenuContent() {
   const searchParams = useSearchParams();
@@ -83,8 +70,15 @@ export function MenuContent() {
           </div>
         </div>
 
-        <div className="page-header__brand">
-          <h1 className="page-header__brand-name">PRALINÉ</h1>
+        <div className="page-header__brand" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <Image
+            src="/logoCB.png"
+            alt="Praliné Coffee House"
+            width={220}
+            height={156}
+            priority
+            style={{ height: 100, width: "auto", objectFit: "contain" }}
+          />
           <p className="page-header__brand-sub">COFFEE HOUSE · SPECIALTY</p>
         </div>
 
@@ -185,7 +179,7 @@ export function MenuContent() {
                   description={prod.description}
                   price={prod.price}
                   badges={prod.badges}
-                  badgeTypes={prod.badgeTypes as any}
+                  badgeTypes={prod.badgeTypes}
                   imageUrl={prod.imageUrl}
                 />
               ))}
@@ -227,7 +221,7 @@ export function MenuContent() {
                         description={prod.description}
                         price={prod.price}
                         badges={prod.badges}
-                        badgeTypes={prod.badgeTypes as any}
+                        badgeTypes={prod.badgeTypes}
                         imageUrl={prod.imageUrl}
                       />
                     ))}
