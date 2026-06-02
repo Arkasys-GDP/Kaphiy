@@ -68,21 +68,27 @@ beforeEach(() => {
 describe("OrderCard", () => {
   it("renders table number and order number", () => {
     const props = makeProps();
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     expect(screen.getByText("3")).toBeInTheDocument(); // tableNumber in display
     expect(screen.getByText(/#PED-0041/)).toBeInTheDocument();
   });
 
   it("renders all order items by name", () => {
     const props = makeProps();
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     expect(screen.getByText("Latte de Avellana")).toBeInTheDocument();
     expect(screen.getByText("Croissant Praliné")).toBeInTheDocument();
   });
 
   it("shows quantity for each item", () => {
     const props = makeProps();
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     // item qty bubbles
     const qtyBubbles = screen.getAllByRole("generic", {}).filter(
       (el) => el.getAttribute("aria-label")?.startsWith("Cantidad:"),
@@ -92,40 +98,52 @@ describe("OrderCard", () => {
 
   it("shows dietary flag chip for allergen", () => {
     const props = makeProps();
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     expect(screen.getByText("Lactosa")).toBeInTheDocument();
     expect(screen.getByText("Gluten")).toBeInTheDocument();
   });
 
   it("renders 'Iniciar preparación' button for PENDING order", () => {
     const props = makeProps();
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     expect(screen.getByRole("button", { name: /iniciar preparación/i })).toBeInTheDocument();
   });
 
   it("calls onStart when action button clicked on PENDING order", async () => {
     const props = makeProps();
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     fireEvent.click(screen.getByRole("button", { name: /iniciar preparación/i }));
     expect(props.onStart).toHaveBeenCalledWith("41");
   });
 
   it("renders 'Listo para entregar' button for IN_PREP order", () => {
     const props = makeProps({ status: "IN_PREP" });
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     expect(screen.getByRole("button", { name: /listo para entregar/i })).toBeInTheDocument();
   });
 
   it("calls onReady when action button clicked on IN_PREP order", async () => {
     const props = makeProps({ status: "IN_PREP" });
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     fireEvent.click(screen.getByRole("button", { name: /listo para entregar/i }));
     expect(props.onReady).toHaveBeenCalledWith("41");
   });
 
   it("renders 'Marcar entregado' button for READY order", () => {
     const props = makeProps({ status: "READY" });
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     expect(
       screen.getByRole("button", { name: /marcar entregado/i }),
     ).toBeInTheDocument();
@@ -133,14 +151,18 @@ describe("OrderCard", () => {
 
   it("calls onDeliver when action button clicked on READY order", () => {
     const props = makeProps({ status: "READY" });
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     fireEvent.click(screen.getByRole("button", { name: /marcar entregado/i }));
     expect(props.onDeliver).toHaveBeenCalledWith("41");
   });
 
   it("renders per-item out-of-stock buttons for PENDING order", () => {
     const props = makeProps();
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     // one PackageX button per item
     const oos = screen.getAllByRole("button", { name: /agotado/i });
     expect(oos).toHaveLength(2);
@@ -148,7 +170,9 @@ describe("OrderCard", () => {
 
   it("calls onOutOfStock with correct itemId", () => {
     const props = makeProps();
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     const [firstBtn] = screen.getAllByRole("button", { name: /Latte de Avellana/i });
     fireEvent.click(firstBtn!);
     expect(props.onOutOfStock).toHaveBeenCalledWith("41", "101");
@@ -156,7 +180,9 @@ describe("OrderCard", () => {
 
   it("hides out-of-stock buttons for READY order", () => {
     const props = makeProps({ status: "READY" });
-    renderWithProviders(<OrderCard {...props} />);
+    renderWithProviders(<OrderCard onPay={function (id: string): Promise<boolean> {
+      throw new Error("Function not implemented.");
+    }} {...props} />);
     expect(screen.queryByRole("button", { name: /agotado/i })).not.toBeInTheDocument();
   });
 });

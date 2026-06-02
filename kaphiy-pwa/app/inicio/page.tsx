@@ -5,33 +5,13 @@ import { MapPin, Search, ChevronRight, Sparkles, TrendingUp } from "lucide-react
 import { BottomNav } from "@/components/pwa/BottomNav";
 import { FeaturedCard } from "@/components/pwa/FeaturedCard";
 import { ProductListItem } from "@/components/pwa/ProductListItem";
-import { getProducts, getCategories, adaptProduct, type ApiCategory } from "@/lib/api";
-import { uniqueCategories } from "@/lib/categories";
+import { getProducts, getCategories, adaptProduct, getCategoryEmoji, ApiCategory } from "@/lib/api";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
 type ProductBadgeType = "green" | "rose" | "muted" | "dark";
-
-const CATEGORY_EMOJIS: Record<string, string> = {
-  café: "☕",
-  bebidas: "🧋",
-  postres: "🍰",
-  snacks: "🥪",
-  especiales: "✨",
-  default: "🍽️",
-};
-
-function getCategoryEmoji(name: string): string {
-  const key = Object.keys(CATEGORY_EMOJIS).find((k) => name.toLowerCase().includes(k));
-  return key ? CATEGORY_EMOJIS[key] : CATEGORY_EMOJIS.default;
-}
-
-function normalizeBadgeTypes(types: string[]): ProductBadgeType[] {
-  return types.filter((type): type is ProductBadgeType =>
-    ["green", "rose", "muted", "dark"].includes(type),
-  );
-}
 
 export default function InicioPage() {
   const router = useRouter();
@@ -72,8 +52,15 @@ export default function InicioPage() {
           </div>
         </div>
 
-        <div className="page-header__brand">
-          <h1 className="page-header__brand-name">PRALINÉ</h1>
+        <div className="page-header__brand" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <Image
+            src="/logoCB.png"
+            alt="Praliné Coffee House"
+            width={250}
+            height={80}
+            priority
+            style={{ height: 100, width: "auto", objectFit: "contain" }}
+          />
           <p className="page-header__brand-sub">COFFEE HOUSE · SPECIALTY</p>
         </div>
 
@@ -207,7 +194,7 @@ export default function InicioPage() {
                 description={item.description}
                 price={item.price}
                 badges={item.badges}
-                badgeTypes={normalizeBadgeTypes(item.badgeTypes)}
+                badgeTypes={item.badgeTypes}
                 imageUrl={item.imageUrl}
               />
             ))
@@ -240,8 +227,8 @@ export default function InicioPage() {
           onClick={() => router.push("/chat")}
           style={{ pointerEvents: "auto" }}
         >
-          <Sparkles size={17} strokeWidth={2.4} />
-          Hablar con IA
+          <Sparkles size={16} />
+          Pide con KAPHIY
         </button>
       </div>
 

@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ChevronLeft, MessageSquare } from "lucide-react";
 import { getProduct, adaptProduct } from "@/lib/api";
 import Link from "next/link";
+import Image from "next/image";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
 
@@ -90,11 +91,13 @@ export default function ProductDetailPage() {
           <ChevronLeft size={20} color="#3e3b30" />
         </button>
         {product.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={product.imageUrl}
             alt={product.name}
-            style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
+            fill
+            priority
+            sizes="(max-width: 430px) 100vw, 430px"
+            style={{ objectFit: "cover" }}
           />
         ) : (
           <div style={{ fontSize: "5rem", lineHeight: 1, filter: "drop-shadow(0 8px 24px rgba(90,58,46,.2))" }}>

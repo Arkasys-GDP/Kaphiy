@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CheckCircle, List } from "lucide-react";
 
 function CoffeeBean({
@@ -28,11 +29,11 @@ function CoffeeBean({
         pointerEvents: "none",
       }}
     >
-      <svg viewBox="0 0 24 24" fill="#565243">
+      <svg viewBox="0 0 24 24" fill="#fff9f4">
         <ellipse cx="12" cy="12" rx="9" ry="6" />
         <path
           d="M12 6 Q14 12 12 18"
-          stroke="#EFE3D6"
+          stroke="#565243"
           strokeWidth="1.5"
           fill="none"
         />
@@ -46,7 +47,7 @@ export default function SplashPage() {
     <div
       style={{
         minHeight: "100dvh",
-        background: "#EFE3D6",
+        background: "oklch(60.34% 0.057 23.21)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -80,51 +81,28 @@ export default function SplashPage() {
           zIndex: 1,
         }}
       >
-        {/* App icon */}
-        <div
+        {/* Brand logo */}
+        <Image
+          src="/logoCB.png"
+          alt="Praliné Coffee House"
+          width={260}
+          height={120}
+          priority
+          style={{ height: "auto", maxWidth: "70%", objectFit: "contain" }}
+        />
+        <p
           style={{
-            width: 80,
-            height: 80,
-            borderRadius: 24,
-            background: "#565243",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "2.5rem",
-            boxShadow: "0 8px 32px rgba(86,82,67,0.3)",
+            fontFamily: "var(--font-inter)",
+            fontSize: "0.65rem",
+            fontWeight: 500,
+            color: "#EFE3D6",
+            letterSpacing: "0.35em",
+            textTransform: "uppercase",
+            marginTop: "-0.5rem",
           }}
         >
-          ☕
-        </div>
-
-        {/* Brand */}
-        <div style={{ textAlign: "center" }}>
-          <h1
-            style={{
-              fontFamily: "var(--font-playfair)",
-              fontSize: "2.8rem",
-              fontWeight: 700,
-              color: "#3e3b30",
-              letterSpacing: "0.15em",
-              marginBottom: "0.3rem",
-              lineHeight: 1,
-            }}
-          >
-            PRALINÉ
-          </h1>
-          <p
-            style={{
-              fontFamily: "var(--font-inter)",
-              fontSize: "0.65rem",
-              fontWeight: 500,
-              color: "#8a6555",
-              letterSpacing: "0.35em",
-              textTransform: "uppercase",
-            }}
-          >
-            COFFEE HOUSE · SPECIALTY
-          </p>
-        </div>
+          COFFEE HOUSE · SPECIALTY
+        </p>
 
         {/* Divider */}
         <div
@@ -141,7 +119,7 @@ export default function SplashPage() {
             fontFamily: "var(--font-playfair)",
             fontStyle: "italic",
             fontSize: "1.1rem",
-            color: "#5A3A2E",
+            color: "#EFE3D6",
             textAlign: "center",
             lineHeight: 1.5,
           }}
@@ -158,7 +136,7 @@ export default function SplashPage() {
                 width: i === 1 ? 20 : 6,
                 height: 6,
                 borderRadius: 9999,
-                background: i === 1 ? "#A27572" : "#d8c8b8",
+                background: i === 1 ? "#EFE3D6" : "#EFE3D6",
                 transition: "width 0.3s",
               }}
             />
@@ -195,7 +173,7 @@ export default function SplashPage() {
             style={{
               fontFamily: "var(--font-inter)",
               fontSize: "0.6rem",
-              color: "#8a6555",
+              color: "#EFE3D6",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               marginBottom: "0.3rem",
@@ -222,7 +200,7 @@ export default function SplashPage() {
               style={{
                 fontFamily: "var(--font-inter)",
                 fontSize: "0.7rem",
-                color: "#8a6555",
+                color: "#EFE3D6",
               }}
             >
               Mesero Virtual IA

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Message } from "@/types/chat";
-import { adaptProduct, getProducts } from "@/lib/api";
-import { getInvalidOrderItems, normalizeCartItems } from "@/lib/order";
+import { generateUUID } from "@/lib/session";
 
 export function formatTime() {
   return new Date().toLocaleTimeString("es-EC", {
@@ -55,17 +54,6 @@ export function useChat() {
   const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
-    const generateUUID = (): string => {
-      if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-        return crypto.randomUUID();
-      }
-      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-        const r = (Math.random() * 16) | 0;
-        const v = c === "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      });
-    };
-
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
     let sid = localStorage.getItem("chat_session_id");
@@ -84,28 +72,39 @@ export function useChat() {
     } else {
       const savedMessages = localStorage.getItem("chat_messages");
       if (savedMessages) {
-        try { setMessages(JSON.parse(savedMessages)); } catch {}
+        try {
+          setMessages(JSON.parse(savedMessages));
+        } catch {
+          // corrupt entry — ignore
+        }
       }
     }
     setIsInitialized(true);
 
-    const checkOnlineStatus = async () => {
+    let cancelled = false;
+    (async () => {
       try {
-        await fetch('/api/n8n-webhook', { method: 'OPTIONS' });
-        setIsOnline(true);
+        await fetch("/api/n8n-webhook", { method: "OPTIONS" });
+        if (!cancelled) setIsOnline(true);
       } catch {
-        setIsOnline(false);
+        if (!cancelled) setIsOnline(false);
       }
+    })();
+    return () => {
+      cancelled = true;
     };
-    checkOnlineStatus();
   }, []);
 
+  // Persist messages only when they change (not on isTyping flicker).
   useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem("chat_messages", JSON.stringify(messages));
-    }
+    if (!isInitialized) return;
+    localStorage.setItem("chat_messages", JSON.stringify(messages));
+  }, [messages, isInitialized]);
+
+  // Auto-scroll separately — triggers on messages + typing indicator.
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isInitialized, isTyping]);
+  }, [messages, isTyping]);
 
   async function toggleRecording() {
     if (isRecording) {

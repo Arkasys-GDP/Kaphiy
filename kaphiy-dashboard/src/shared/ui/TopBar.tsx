@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Image from "next/image"
 import { Volume2, VolumeX } from "lucide-react"
 import { ConnectionBadge } from "./ConnectionBadge"
 import { useKaphiyStore } from "@/src/features/orders/store"
@@ -44,9 +45,14 @@ export function TopBar() {
       className="flex h-17 shrink-0 items-center gap-4 bg-praline px-7 text-paper"
     >
       {/* Brand */}
-      <span className="font-display text-xl font-semibold tracking-widest">
-        PRALIN<em className="text-crema not-italic">É</em>
-      </span>
+      <Image
+        src="/logoCB.png"
+        alt="Praliné Coffee House"
+        width={200}
+        height={80}
+        priority
+        className="h-9 w-auto object-contain"
+      />
 
       {/* Divider */}
       <span aria-hidden className="h-8 w-px bg-white/20" />
