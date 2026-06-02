@@ -10,6 +10,35 @@ export function formatTime() {
   });
 }
 
+interface WebhookResponse {
+  response?: string;
+  orderReady?: boolean;
+  cartItems?: unknown;
+  aiNotes?: unknown;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function pendingProductFallback(messageText: string, cartItems: unknown): unknown[] {
+  const pendingProduct = sessionStorage.getItem("pending_chat_product");
+  if (pendingProduct) {
+    try {
+      return [JSON.parse(pendingProduct) as unknown];
+    } catch {
+      sessionStorage.removeItem("pending_chat_product");
+    }
+  }
+
+  if (!messageText) return [];
+  const firstItem = Array.isArray(cartItems) && isRecord(cartItems[0]) ? cartItems[0] : {};
+  return [{
+    name: messageText,
+    quantity: firstItem.quantity ?? firstItem.qty ?? firstItem.cantidad ?? 1,
+  }];
+}
+
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -154,25 +183,61 @@ export function useChat() {
       }
 
       const textResponse = await response.text();
-      let data: any = {};
+      let data: WebhookResponse = {};
       
       try {
-        data = JSON.parse(textResponse);
-      } catch (e) {
+        data = JSON.parse(textResponse) as WebhookResponse;
+      } catch {
         const match = textResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
         if (match && match[1]) {
-          try { data = JSON.parse(match[1]); } catch(err) {}
+          try { data = JSON.parse(match[1]) as WebhookResponse; } catch {}
         }
         if (!data.response) {
           data = { response: textResponse };
         }
       }
 
-      if (data.orderReady && data.cartItems) {
-        localStorage.setItem("current_order", JSON.stringify({
-          cartItems: data.cartItems,
-          aiNotes: data.aiNotes || []
-        }));
+      let orderReady = Boolean(data.orderReady);
+      if (orderReady) {
+        if (!Array.isArray(data.cartItems)) {
+          localStorage.removeItem("current_order");
+          orderReady = false;
+          data.response = `${data.response || ""}\n\nNo pude preparar ese pedido. Elige un producto del menu o vuelve a intentarlo con el nombre exacto.`.trim();
+        } else {
+          let products: ReturnType<typeof adaptProduct>[] = [];
+          try {
+            const apiProducts = await getProducts();
+            products = apiProducts.map(adaptProduct);
+          } catch (productError) {
+            console.error("Error al consultar productos para validar el pedido:", productError);
+          }
+
+          let cartItems = normalizeCartItems(data.cartItems, products);
+          let invalidItems = getInvalidOrderItems(cartItems);
+          if (cartItems.length === 0 || invalidItems.length > 0) {
+            const fallbackItems = normalizeCartItems(
+              pendingProductFallback(msgText, data.cartItems),
+              products,
+            );
+            const fallbackInvalidItems = getInvalidOrderItems(fallbackItems);
+            if (fallbackItems.length > 0 && fallbackInvalidItems.length === 0) {
+              cartItems = fallbackItems;
+              invalidItems = [];
+            }
+          }
+
+          if (cartItems.length === 0 || invalidItems.length > 0) {
+            localStorage.removeItem("current_order");
+            orderReady = false;
+            data.response = `${data.response || ""}\n\nNo pude preparar ese pedido. Elige un producto del menu o vuelve a intentarlo con el nombre exacto.`.trim();
+          } else {
+            localStorage.setItem("current_order", JSON.stringify({
+              cartItems,
+              aiNotes: Array.isArray(data.aiNotes) ? data.aiNotes : [],
+            }));
+            sessionStorage.removeItem("pending_chat_product");
+          }
+        }
       }
 
       const aiMsg: Message = {
@@ -180,7 +245,7 @@ export function useChat() {
         role: "ai",
         text: data.response || "Lo siento, no tengo respuesta en este momento.",
         time: formatTime(),
-        isOrderReady: !!data.orderReady
+        isOrderReady: orderReady
       };
       setMessages((prev) => [...prev, aiMsg]);
     } catch (error) {

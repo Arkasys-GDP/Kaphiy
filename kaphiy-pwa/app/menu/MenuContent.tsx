@@ -9,6 +9,7 @@ import { getProducts, getCategories, adaptProduct, getCategoryEmoji, ApiCategory
 import { useSearchParams, useRouter } from "next/navigation";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
+type ProductBadgeType = "green" | "rose" | "muted" | "dark";
 
 export function MenuContent() {
   const searchParams = useSearchParams();
@@ -31,7 +32,7 @@ export function MenuContent() {
     Promise.all([getProducts(), getCategories()])
       .then(([prods, cats]) => {
         setProducts(prods.map(adaptProduct));
-        setCategories(cats);
+        setCategories(uniqueCategories(cats));
         setLoading(false);
       })
       .catch(() => {

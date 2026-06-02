@@ -34,8 +34,10 @@ export default function ProductDetailPage() {
         });
     } else {
       // ID no válido
-      setProduct(null);
-      setLoading(false);
+      void Promise.resolve().then(() => {
+        setProduct(null);
+        setLoading(false);
+      });
     }
   }, [rawId]);
 
@@ -65,6 +67,17 @@ export default function ProductDetailPage() {
     rose: { background: "rgba(162,117,114,0.15)", color: "#A27572" },
     muted: { background: "#f0e8de", color: "#8a6555" },
     dark: { background: "#3e3b30", color: "#fff9f4" },
+  };
+
+  const requestProductInChat = () => {
+    sessionStorage.setItem("pending_chat_message", `Quiero pedir un ${product.name}`);
+    sessionStorage.setItem("pending_chat_product", JSON.stringify({
+      productId: Number(product.id),
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+    }));
+    router.push("/chat");
   };
 
   return (
@@ -169,12 +182,10 @@ export default function ProductDetailPage() {
 
       {/* CTA */}
       <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, padding: "1rem 1.25rem 1.5rem", background: "linear-gradient(to top, #fff9f4 60%, transparent)", zIndex: 50 }}>
-        <Link href={`/chat?msg=${encodeURIComponent("Quiero pedir un " + product.name)}`} style={{ textDecoration: "none" }}>
-          <button className="btn-primary">
-            <MessageSquare size={17} />
-            Pedir por Chat con IA
-          </button>
-        </Link>
+        <button className="btn-primary" onClick={requestProductInChat}>
+          <MessageSquare size={17} />
+          Pedir por Chat con IA
+        </button>
       </div>
     </div>
   );

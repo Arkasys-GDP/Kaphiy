@@ -109,7 +109,7 @@ describe("useChat (integration with localStorage + webhook)", () => {
           JSON.stringify({
             response: "Pedido listo",
             orderReady: true,
-            cartItems: [{ productId: 1, quantity: 2 }],
+            cartItems: [{ productId: 101, quantity: 2 }],
             aiNotes: ["sin azúcar"],
           }),
         ),
@@ -125,8 +125,74 @@ describe("useChat (integration with localStorage + webhook)", () => {
 
     const saved = JSON.parse(localStorage.getItem("current_order") ?? "{}");
     expect(saved).toEqual({
-      cartItems: [{ productId: 1, quantity: 2 }],
+      cartItems: [
+        {
+          id: "101",
+          productId: 101,
+          name: "Latte de Avena",
+          price: 14.5,
+          qty: 2,
+          emoji: "☕",
+        },
+      ],
       aiNotes: ["sin azúcar"],
+    });
+    expect(result.current.messages.at(-1)?.isOrderReady).toBe(true);
+  });
+
+  it("does not store current_order when webhook sends Producto without productId", async () => {
+    server.use(
+      http.options(WEBHOOK, () => new HttpResponse(null, { status: 204 })),
+      http.post(WEBHOOK, () =>
+        HttpResponse.text(
+          JSON.stringify({
+            response: "Pedido listo",
+            orderReady: true,
+            cartItems: [{ name: "Producto", price: 0, quantity: 1 }],
+          }),
+        ),
+      ),
+    );
+
+    const { result } = renderHook(() => useChat());
+    await waitFor(() => expect(result.current.isInitialized).toBe(true));
+
+    await act(async () => {
+      await result.current.handleSend("Confirmar pedido");
+    });
+
+    expect(localStorage.getItem("current_order")).toBeNull();
+    expect(result.current.messages.at(-1)?.isOrderReady).toBe(false);
+    expect(result.current.messages.at(-1)?.text).toMatch(/preparar ese pedido/i);
+  });
+
+  it("recovers product from the user message when webhook sends a generic item", async () => {
+    server.use(
+      http.options(WEBHOOK, () => new HttpResponse(null, { status: 204 })),
+      http.post(WEBHOOK, () =>
+        HttpResponse.text(
+          JSON.stringify({
+            response: "Pedido listo",
+            orderReady: true,
+            cartItems: [{ name: "Producto", price: 0, quantity: 2 }],
+          }),
+        ),
+      ),
+    );
+
+    const { result } = renderHook(() => useChat());
+    await waitFor(() => expect(result.current.isInitialized).toBe(true));
+
+    await act(async () => {
+      await result.current.handleSend("Quiero pedir un Croissant");
+    });
+
+    const saved = JSON.parse(localStorage.getItem("current_order") ?? "{}");
+    expect(saved.cartItems[0]).toMatchObject({
+      productId: 102,
+      name: "Croissant",
+      price: 9.9,
+      qty: 2,
     });
     expect(result.current.messages.at(-1)?.isOrderReady).toBe(true);
   });

@@ -29,7 +29,16 @@ function ChatContent() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isInitialized || !msg) return;
+    if (!isInitialized) return;
+
+    const pendingMessage = sessionStorage.getItem("pending_chat_message");
+    if (pendingMessage) {
+      sessionStorage.removeItem("pending_chat_message");
+      handleSend(pendingMessage);
+      return;
+    }
+
+    if (!msg) return;
 
     // Clave única por mensaje para no reenviarlo si el componente se re-monta
     const sentKey = `msg_sent_${msg}`;

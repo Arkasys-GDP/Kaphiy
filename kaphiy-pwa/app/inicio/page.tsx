@@ -11,6 +11,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
+type ProductBadgeType = "green" | "rose" | "muted" | "dark";
 
 export default function InicioPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function InicioPage() {
     Promise.all([getProducts(), getCategories()])
       .then(([prods, cats]) => {
         setProducts(prods.map(adaptProduct));
-        setCategories(cats);
+        setCategories(uniqueCategories(cats));
         setLoading(false);
       })
       .catch(() => {
@@ -209,7 +210,7 @@ export default function InicioPage() {
       <div
         style={{
           position: "fixed",
-          bottom: "5.5rem",
+          bottom: "5.25rem",
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 40,
@@ -217,12 +218,14 @@ export default function InicioPage() {
           maxWidth: 430,
           display: "flex",
           justifyContent: "center",
+          pointerEvents: "none",
         }}
       >
         <button
           id="hablar-ia-btn"
           className="btn-ia-fab"
           onClick={() => router.push("/chat")}
+          style={{ pointerEvents: "auto" }}
         >
           <Sparkles size={16} />
           Pide con KAPHIY

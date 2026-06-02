@@ -172,7 +172,7 @@ function ConfirmationScreen({
 
 export default function PedidoPage() {
   const router = useRouter();
-  const [items, setItems] = useState<OrderItem[]>([]);
+  const [items, setItems] = useState<PendingOrderItem[]>([]);
   const [aiNotes, setAiNotes] = useState<string[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [confirmed, setConfirmed] = useState(false);
@@ -180,6 +180,7 @@ export default function PedidoPage() {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [orderError, setOrderError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -291,7 +292,7 @@ export default function PedidoPage() {
       setConfirmed(true);
     } catch (err) {
       console.error(err);
-      setSubmitError("Error al enviar el pedido. Por favor intenta de nuevo.");
+      setSubmitError(err instanceof Error ? err.message : "Error al enviar el pedido. Por favor intenta de nuevo.");
     } finally {
       setIsSubmitting(false);
     }
@@ -402,7 +403,16 @@ export default function PedidoPage() {
                       flexShrink: 0,
                     }}
                   >
-                    ☕
+                    {item.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      item.emoji ?? "☕"
+                    )}
                   </div>
 
                   <div style={{ flex: 1 }}>

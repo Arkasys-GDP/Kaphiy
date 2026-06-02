@@ -23,6 +23,7 @@ export interface ApiProductIngredient {
 
 export interface ApiProduct {
   id: number;
+  legacyId?: number | null;
   name: string;
   price: number | string;
   aiDescription?: string;
@@ -66,7 +67,7 @@ export async function getCategories(): Promise<ApiCategory[]> {
 // ─── Orders ───────────────────────────────────────────────────────────────────
 
 export interface CreateOrderDto {
-  tableId?: number;
+  tableId: number;
   chatSessionId?: string;
   paymentCode?: string;
   paymentStatus?: PaymentStatus;
@@ -132,6 +133,8 @@ export function adaptProduct(p: ApiProduct) {
 
   return {
     id: String(p.id),
+    productId: p.id,
+    legacyId: p.legacyId ?? null,
     name: p.name,
     category: categoryKey,
     categoryLabel: p.category?.name ?? "Menú",

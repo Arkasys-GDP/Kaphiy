@@ -450,16 +450,17 @@
     background: var(--color-praline-primary-dark);
     color: var(--color-praline-surface);
     border-radius: 9999px;
-    padding: 0.7rem 1.5rem;
+    padding: 0.75rem 1.55rem;
     font-family: var(--font-inter), 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 0.875rem;
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(62, 59, 48, 0.35);
+    box-shadow: 0 6px 18px rgba(62, 59, 48, 0.32);
     white-space: nowrap;
     transition: transform 0.15s, box-shadow 0.15s;
   }
