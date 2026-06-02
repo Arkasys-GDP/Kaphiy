@@ -5,13 +5,12 @@ import { MapPin, Search, ChevronRight, Sparkles, TrendingUp } from "lucide-react
 import { BottomNav } from "@/components/pwa/BottomNav";
 import { FeaturedCard } from "@/components/pwa/FeaturedCard";
 import { ProductListItem } from "@/components/pwa/ProductListItem";
-import { getProducts, getCategories, adaptProduct, getCategoryEmoji, ApiCategory } from "@/lib/api";
+import { getProducts, getCategories, adaptProduct, getCategoryEmoji, uniqueCategories, ApiCategory } from "@/lib/api";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
-type ProductBadgeType = "green" | "rose" | "muted" | "dark";
 
 export default function InicioPage() {
   const router = useRouter();

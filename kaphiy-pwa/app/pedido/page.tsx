@@ -5,7 +5,7 @@ import { ChevronLeft, CheckCircle, Minus, Plus, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createOrder, getProducts, adaptProduct } from "@/lib/api";
-import { getOrCreateChatSessionId, clearOrderSession } from "@/lib/session";
+import { getOrCreateChatSessionId } from "@/lib/session";
 import { getKitchenLabel, getPaymentLabel, isOrderTerminal } from "@/lib/order-status";
 import { useOrderPolling } from "@/hooks/useOrderPolling";
 
@@ -14,6 +14,8 @@ interface OrderItem {
   name: string;
   price: number;
   qty: number;
+  imageUrl?: string;
+  emoji?: string;
 }
 
 interface SavedCartItem {
@@ -172,7 +174,7 @@ function ConfirmationScreen({
 
 export default function PedidoPage() {
   const router = useRouter();
-  const [items, setItems] = useState<PendingOrderItem[]>([]);
+  const [items, setItems] = useState<OrderItem[]>([]);
   const [aiNotes, setAiNotes] = useState<string[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [confirmed, setConfirmed] = useState(false);
@@ -180,7 +182,6 @@ export default function PedidoPage() {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [orderError, setOrderError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -235,6 +236,8 @@ export default function PedidoPage() {
             name: finalName,
             price: finalPrice,
             qty: parseInt(String(item.qty ?? item.cantidad ?? item.quantity ?? 1), 10) || 1,
+            imageUrl: matchedProd?.imageUrl,
+            emoji: matchedProd?.emoji,
           };
         });
 

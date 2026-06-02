@@ -5,11 +5,10 @@ import Image from "next/image";
 import { MapPin, Search, ChevronDown, ChevronRight } from "lucide-react";
 import { BottomNav } from "@/components/pwa/BottomNav";
 import { ProductListItem } from "@/components/pwa/ProductListItem";
-import { getProducts, getCategories, adaptProduct, getCategoryEmoji, ApiCategory } from "@/lib/api";
+import { getProducts, getCategories, adaptProduct, getCategoryEmoji, uniqueCategories, ApiCategory } from "@/lib/api";
 import { useSearchParams, useRouter } from "next/navigation";
 
 type AdaptedProduct = ReturnType<typeof adaptProduct>;
-type ProductBadgeType = "green" | "rose" | "muted" | "dark";
 
 export function MenuContent() {
   const searchParams = useSearchParams();

@@ -114,6 +114,22 @@ export function getCategoryEmoji(name: string): string {
   return match?.[1] ?? CATEGORY_EMOJIS.default;
 }
 
+/**
+ * Dedupe categories by lowercase name — backend may return repeats when
+ * join with products explodes the result set. Keeps first occurrence.
+ */
+export function uniqueCategories(cats: ApiCategory[]): ApiCategory[] {
+  const seen = new Set<string>();
+  const out: ApiCategory[] = [];
+  for (const c of cats) {
+    const key = c.name.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(c);
+  }
+  return out;
+}
+
 export function adaptProduct(p: ApiProduct) {
   const categoryKey = p.category?.name?.toLowerCase() ?? "default";
   const emoji = getCategoryEmoji(p.category?.name ?? "default");

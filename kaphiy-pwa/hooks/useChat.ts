@@ -1,6 +1,72 @@
 import { useState, useRef, useEffect } from "react";
 import { Message } from "@/types/chat";
 import { generateUUID } from "@/lib/session";
+import { adaptProduct, getProducts } from "@/lib/api";
+
+type AdaptedProduct = ReturnType<typeof adaptProduct>;
+
+/** Cart item shape persisted in `localStorage["current_order"]`. */
+interface NormalizedCartItem {
+  id: string;
+  productId: number | null;
+  name: string;
+  productName: string;
+  price: number;
+  unitPrice: number;
+  quantity: number;
+  qty: number;
+}
+
+function toNumber(value: unknown, fallback = 0): number {
+  if (typeof value === "number" && !isNaN(value)) return value;
+  const parsed = parseFloat(String(value ?? ""));
+  return isNaN(parsed) ? fallback : parsed;
+}
+
+/**
+ * Convert raw cart items returned by the n8n webhook into a uniform shape
+ * matched against the live product catalog. Unmatched items keep `productId = null`
+ * so `getInvalidOrderItems` can reject them.
+ */
+function normalizeCartItems(raw: unknown, products: AdaptedProduct[]): NormalizedCartItem[] {
+  if (!Array.isArray(raw)) return [];
+
+  return raw.flatMap<NormalizedCartItem>((entry, idx) => {
+    if (!isRecord(entry)) return [];
+
+    const rawId = entry.id ?? entry.productId ?? entry.product_id;
+    const rawName = String(entry.name ?? entry.productName ?? entry.nombre ?? "").trim();
+    const rawQty = entry.quantity ?? entry.qty ?? entry.cantidad ?? 1;
+    const rawPrice = entry.unitPrice ?? entry.price ?? entry.precio;
+
+    const matched = products.find((p) => {
+      if (rawId != null && String(p.id) === String(rawId)) return true;
+      if (rawName && p.name.trim().toLowerCase() === rawName.toLowerCase()) return true;
+      return false;
+    });
+
+    const productId = matched ? parseInt(matched.id, 10) : null;
+    const finalName = matched ? matched.name : rawName || "Producto";
+    const finalPrice = matched ? matched.price : toNumber(rawPrice, 0);
+    const quantity = Math.max(1, parseInt(String(rawQty), 10) || 1);
+
+    return [{
+      id: matched ? matched.id : String(rawId ?? `temp-${idx}`),
+      productId,
+      name: finalName,
+      productName: finalName,
+      price: finalPrice,
+      unitPrice: finalPrice,
+      quantity,
+      qty: quantity,
+    }];
+  });
+}
+
+/** Items that did not match any product in the catalog. */
+function getInvalidOrderItems(items: NormalizedCartItem[]): NormalizedCartItem[] {
+  return items.filter((it) => it.productId == null);
+}
 
 export function formatTime() {
   return new Date().toLocaleTimeString("es-EC", {
