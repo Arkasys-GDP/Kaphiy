@@ -78,10 +78,10 @@ function ActiveOrderCard({ orderId, onTerminal }: { orderId: number; onTerminal:
           {order.orderItems.map((oi, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem" }}>
               <span style={{ color: "var(--color-praline-brown)" }}>
-                {oi.quantity}× {oi.product.name}
+                {oi.quantity}× {oi.product?.name ?? "(producto eliminado)"}
               </span>
               <span style={{ color: "var(--color-praline-muted)" }}>
-                ${(parseFloat(String(oi.product.price)) * oi.quantity).toFixed(2)}
+                ${(parseFloat(String(oi.product?.price ?? 0)) * oi.quantity).toFixed(2)}
               </span>
             </div>
           ))}
@@ -174,7 +174,7 @@ export default function MisPedidosPage() {
                 localStorage.removeItem("current_order");
                 router.push("/chat");
               }}
-              className="btn-secondary"
+              className="btn-secondary-2"
               style={{ marginTop: "0.5rem" }}
             >
               ✦ Hacer otro pedido

@@ -13,7 +13,7 @@ export interface PolledOrder {
   createdAt: string;
   orderItems: {
     quantity: number;
-    product: { name: string; price: string | number };
+    product: { name: string; price: string | number } | null;
   }[];
 }
 

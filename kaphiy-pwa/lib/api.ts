@@ -64,6 +64,33 @@ export async function getCategories(): Promise<ApiCategory[]> {
   return get<ApiCategory[]>("/categories");
 }
 
+// ─── Tables ───────────────────────────────────────────────────────────────────
+
+export interface ApiTable {
+  id: number;
+  tableName: string;
+  status: "Available" | "Occupied" | "Reserved";
+}
+
+export async function getTables(): Promise<ApiTable[]> {
+  return get<ApiTable[]>("/tables");
+}
+
+/**
+ * Pick a random table id from the available list. Used in demos so each order
+ * lands on a different table, mimicking concurrent customers.
+ * Falls back to id 1 if list empty or fetch fails.
+ */
+export async function pickRandomTableId(): Promise<number> {
+  try {
+    const tables = await getTables();
+    if (tables.length === 0) return 1;
+    return tables[Math.floor(Math.random() * tables.length)].id;
+  } catch {
+    return 1;
+  }
+}
+
 // ─── Orders ───────────────────────────────────────────────────────────────────
 
 export interface CreateOrderDto {

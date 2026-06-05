@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { ChevronLeft, CheckCircle, Minus, Plus, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createOrder, getProducts, adaptProduct } from "@/lib/api";
+import { createOrder, getProducts, adaptProduct, pickRandomTableId } from "@/lib/api";
 import { getOrCreateChatSessionId } from "@/lib/session";
 import { getKitchenLabel, getPaymentLabel, isOrderTerminal } from "@/lib/order-status";
 import { useOrderPolling } from "@/hooks/useOrderPolling";
@@ -165,7 +165,7 @@ function ConfirmationScreen({
         </p>
       )}
 
-      <button className="btn-secondary" style={{ width: "auto", padding: "0.75rem 2rem" }} onClick={onBack}>
+      <button className="btn-secondary-2" style={{ width: "auto", padding: "0.75rem 2rem" }} onClick={onBack}>
         Volver al inicio
       </button>
     </div>
@@ -271,9 +271,10 @@ export default function PedidoPage() {
     setSubmitError(null);
     try {
       const chatSessionId = getOrCreateChatSessionId();
+      const tableId = await pickRandomTableId();
 
       const createdOrder = await createOrder({
-        tableId: 1,
+        tableId,
         chatSessionId,
         items: items.map((item) => ({
           productId: parseInt(item.id, 10),
