@@ -1,6 +1,7 @@
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { TableHydrator } from "@/components/pwa/TableHydrator";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -36,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="es" className={cn(playfair.variable, inter.variable)}>
       <body className="antialiased font-sans">
+        <TableHydrator />
         <div className="praline-container">{children}</div>
       </body>
     </html>

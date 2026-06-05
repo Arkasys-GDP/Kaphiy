@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createOrder, getProducts, adaptProduct, pickRandomTableId } from "@/lib/api";
 import { getOrCreateChatSessionId } from "@/lib/session";
+import { getCurrentTableId } from "@/lib/table-session";
 import { getKitchenLabel, getPaymentLabel, isOrderTerminal } from "@/lib/order-status";
 import { useOrderPolling } from "@/hooks/useOrderPolling";
 
@@ -271,7 +272,10 @@ export default function PedidoPage() {
     setSubmitError(null);
     try {
       const chatSessionId = getOrCreateChatSessionId();
-      const tableId = await pickRandomTableId();
+      // Prefer the table id set by the QR scan (?tableId=N persisted in sessionStorage).
+      // Falls back to a random table only when no QR context exists — keeps the demo working
+      // when the PWA is opened by typing the URL directly.
+      const tableId = getCurrentTableId() ?? (await pickRandomTableId());
 
       const createdOrder = await createOrder({
         tableId,

@@ -59,12 +59,18 @@ export class KitchenService {
   }
 
   private async computeAvgMinutes(startOfDay: Date): Promise<number> {
-    // No completedAt column — approximate using a service-level proxy:
-    // for delivered orders today, we don't have exit timestamp, so return 0 for now.
-    // TODO: add `completed_at` column and fill it on transition to DELIVERED.
-    const _ = startOfDay;
-    void _;
-    return 0;
+    // Avg minutes between order creation and DELIVERED stamp, for today.
+    const rows = await this.prisma.$queryRaw<{ avg_minutes: number | null }[]>`
+      SELECT
+        EXTRACT(EPOCH FROM AVG(completed_at - created_at)) / 60 AS avg_minutes
+      FROM orders
+      WHERE kitchen_status = 'DELIVERED'
+        AND completed_at IS NOT NULL
+        AND created_at >= ${startOfDay}
+        AND deleted_at IS NULL
+    `;
+    const avg = rows[0]?.avg_minutes;
+    return avg ? Math.round(Number(avg) * 10) / 10 : 0;
   }
 
   async findActiveOrder(id: number) {

@@ -63,6 +63,7 @@ model Order {
   paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
   kitchenStatus KitchenStatus @default(WAITING) @map("kitchen_status")
   createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  completedAt   DateTime?     @map("completed_at") @db.Timestamptz(6)
   deletedAt     DateTime?     @map("deleted_at") @db.Timestamptz(6)
   table         Table         @relation(fields: [tableId], references: [id])
   orderItems    OrderItem[]

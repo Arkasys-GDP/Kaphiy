@@ -173,12 +173,27 @@ export class OrdersService {
       ? Number(totalsRow._sum.total)
       : 0;
 
+    // Average prep time (minutes) for delivered orders in the window.
+    const avgRows = await this.prisma.$queryRaw<
+      { avg_minutes: number | null }[]
+    >`
+      SELECT EXTRACT(EPOCH FROM AVG(completed_at - created_at)) / 60 AS avg_minutes
+      FROM orders
+      WHERE kitchen_status = 'DELIVERED'
+        AND completed_at IS NOT NULL
+        AND created_at >= ${sinceISO}::timestamp
+        AND deleted_at IS NULL
+    `;
+    const avgPrepMinutes = avgRows[0]?.avg_minutes
+      ? Math.round(Number(avgRows[0].avg_minutes) * 10) / 10
+      : 0;
+
     return {
       range,
       totals: {
         orders: totalsRow._count._all,
         revenue: totalRevenue,
-        avgPrepMinutes: 0, // requires completed_at column — pending DB change
+        avgPrepMinutes,
         completed: completedCount,
         cancelled: cancelledCount,
       },
@@ -233,7 +248,15 @@ export class OrdersService {
 
     const updated = await this.prisma.order.update({
       where: { id },
-      data: { kitchenStatus },
+      data: {
+        kitchenStatus,
+        // Stamp completedAt the first time order reaches DELIVERED. Skip
+        // overwrite on repeat saves so prep-time metrics stay stable.
+        completedAt:
+          kitchenStatus === KitchenStatus.DELIVERED && !existing.completedAt
+            ? new Date()
+            : undefined,
+      },
       include: ORDER_INCLUDE,
     });
 

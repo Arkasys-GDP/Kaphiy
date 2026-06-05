@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/pwa/BottomNav";
 import { FeaturedCard } from "@/components/pwa/FeaturedCard";
 import { ProductListItem } from "@/components/pwa/ProductListItem";
 import { getProducts, getCategories, adaptProduct, getCategoryEmoji, uniqueCategories, ApiCategory } from "@/lib/api";
+import { getCurrentTableId } from "@/lib/table-session";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -18,6 +19,12 @@ export default function InicioPage() {
   const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [tableId, setTableId] = useState<number | null>(null);
+
+  // Read once on mount — TableHydrator in layout has already persisted the QR value.
+  useEffect(() => {
+    setTableId(getCurrentTableId());
+  }, []);
 
   useEffect(() => {
     Promise.all([getProducts(), getCategories()])
@@ -49,6 +56,23 @@ export default function InicioPage() {
             <MapPin size={13} color="currentColor" />
             Baños de Agua Santa, Ecuador
           </div>
+          {tableId && (
+            <span
+              style={{
+                marginLeft: "auto",
+                background: "rgba(255,249,244,0.15)",
+                color: "#fff9f4",
+                borderRadius: 999,
+                padding: "0.2rem 0.6rem",
+                fontSize: "0.7rem",
+                fontWeight: 600,
+                letterSpacing: "0.05em",
+              }}
+              aria-label={`Mesa ${tableId}`}
+            >
+              Mesa {tableId}
+            </span>
+          )}
         </div>
 
         <div className="page-header__brand" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
