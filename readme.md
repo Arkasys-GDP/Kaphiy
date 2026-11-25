@@ -78,34 +78,53 @@ El proyecto sigue principios clave de ingeniería de software:
 
 ---
 
-## 📊 Estado del Proyecto
+## 📸 Capturas
 
-🔧 En desarrollo (MVP)
+| Panel de cocina | Menú (app de clientes) | Asistente con IA |
+|---|---|---|
+| ![Panel de cocina con pedidos activos](docs/capturas/panel-cocina.png) | ![Menú de Praliné en la app](docs/capturas/app-menu.png) | ![Pantalla del asistente KAPHY](docs/capturas/app-asistente.png) |
 
-Actualmente se está trabajando en:
-
-- Backend (API de productos y pedidos)
-- Integración con base de datos
-- Estructura inicial del frontend
+Capturas tomadas con el sistema corriendo en local y los datos de ejemplo de `prisma/seed.ts`.
 
 ---
 
-## 📈 Roadmap
+## 📊 Estado del Proyecto
 
-### Fase 1 (MVP)
-- CRUD de productos
-- Creación de pedidos
-- Conexión frontend-backend
+El sistema se probó con Praliné Coffee House y se detuvo al evaluar su viabilidad económica. El backend que estaba desplegado ya no está en línea, por eso el panel publicado en Vercel no carga pedidos. Todo el sistema funciona en local siguiendo los pasos de abajo.
 
-### Fase 2
-- Integración de IA (chatbot)
-- Recomendaciones inteligentes
-- Mejora de UX
+---
 
-### Fase 3
-- Procesamiento de voz
-- Automatización con n8n
-- Despliegue en producción con Docker
+## ▶️ Ejecutar en local
+
+Requisitos: Node.js 22 o superior y Docker.
+
+1. Levantar una base de datos PostgreSQL:
+
+```bash
+docker run -d --name kaphiy-pg -e POSTGRES_USER=kaphiy -e POSTGRES_PASSWORD=kaphiy_local -e POSTGRES_DB=kaphiy -p 5433:5432 postgres:16-alpine
+```
+
+2. Backend (puerto 3001). En `backend/.env`, apuntar `DATABASE_URL` a esa base:
+
+```bash
+cd backend
+npm ci
+npx prisma db push
+npx tsx prisma/seed.ts
+npx tsx prisma/seed-barista.ts
+npx nest start
+```
+
+`seed-barista.ts` crea el barista de turno; el PIN se define con `SEED_BARISTA_PIN` (ver el script).
+
+3. Panel de cocina (puerto 3002) y app de clientes (puerto 3003), con `NEXT_PUBLIC_API_URL=http://localhost:3001`:
+
+```bash
+cd kaphiy-dashboard && npm ci && npx next dev -p 3002
+cd kaphiy-pwa && npm ci && npx next dev -p 3003
+```
+
+> Nota: `prisma/migrations` solo contiene la migración inicial. El resto de cambios del esquema se aplicó directamente sobre la base, por eso en una base nueva se usa `prisma db push` en lugar de `prisma migrate deploy`.
 
 ---
 
@@ -132,7 +151,7 @@ Este proyecto forma parte del proceso de formación en Ingeniería de Software, 
 ---
 
 ## 🔮 Visión
-s
+
 KAPHIY busca posicionar a Praliné Coffee House como una marca innovadora, combinando tecnología y experiencia gastronómica para ofrecer un servicio moderno, eficiente y memorable.
 
 ---
